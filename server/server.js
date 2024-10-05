@@ -1,11 +1,12 @@
-const express = require('express');
-const cors = require('cors');
+import express from 'express';
+import cors from 'cors';
+const { json } = express;
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors()); // To allow requests from React frontend
-app.use(express.json()); // To parse JSON request bodies
+app.use(json()); // To parse JSON request bodies
 
 // Define a simple route
 app.get('/api/greet', (req, res) => {
