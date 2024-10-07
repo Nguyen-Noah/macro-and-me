@@ -12,7 +12,7 @@
     "globals": "^15.10.0"
   },
   "scripts": {
-    "start": "concurrently \"npm run start:frontend\" \"npm run start:backend",
+    "start": "concurrently \"npm run start:frontend\" \"npm run start:backend\"",
     "start:frontend": "npm run start --prefix macro-and-me",
     "start:backend": "nodemon server/server.js",
     "start:frontend-dev": "npm run start --prefix macro-and-me",
