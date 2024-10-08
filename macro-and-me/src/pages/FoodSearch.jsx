@@ -5,20 +5,22 @@ export default function FoodSearch() {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-
   const handleSubmit = async (e) => {
+    //Event handlder to check if search is blank.
     e.preventDefault();
     if (query === '') return;
 
     setLoading(true);
     setError('');
 
+
+    //USDA API Key from env
     try {
-      const apiKey = process.env.REACT_APP_USDA_API_KEY; // USDA API Key from env
+      const apiKey = process.env.REACT_APP_USDA_API_KEY; 
       const apiUrl = `https://api.nal.usda.gov/fdc/v1/foods/search?query=${query}&api_key=${apiKey}`;
       const response = await fetch(apiUrl);
       const data = await response.json();
-
+      //Check response to retrieve food data
       if (response.ok) {
         setResults(data.foods);
       } else {
@@ -31,15 +33,15 @@ export default function FoodSearch() {
     }
   };
 
-  // Nutrient ID mapping to macronutrients
+  //Nutrient ID mapping to macronutrients
   const nutrientMap = {
-    1008: 'calories', // Energy
-    1003: 'protein',  // Protein
-    1004: 'fat',      // Total lipid (fat)
-    1005: 'carbohydrates' // Carbohydrates
+    1008: 'calories', //Energy
+    1003: 'protein',  //Protein
+    1004: 'fat',      //Total lipid (fat)
+    1005: 'carbohydrates' //Carbohydrates
   };
 
-  // Helper function to extract macronutrients
+  //Helper function to extract macronutrients
   const getMacronutrients = (foodNutrients) => {
     const macros = {
       calories: null,

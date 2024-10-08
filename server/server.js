@@ -3,6 +3,7 @@ import cors from 'cors';
 const { json } = express;
 const app = express();
 const PORT = process.env.PORT || 5000;
+require('dotenv').config();
 
 // Middleware
 app.use(cors()); // To allow requests from React frontend
