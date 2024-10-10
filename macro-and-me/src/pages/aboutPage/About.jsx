@@ -4,7 +4,7 @@ import choice from "../../utils.js";
 
 const homePageBackground = ["fries", "salad", "lime", "carbs"];
 
-export default function Landing() {
+export default function About() {
     return (
         <div
             className="absolute inset-0 bg-fixed bg-cover bg-center h-screen overflow-y-scroll"

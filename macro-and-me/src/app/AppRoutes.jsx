@@ -4,13 +4,13 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import Home from '../pages/userHome/Home';
 import FoodSearch from '../pages/FoodSearch';
 import Login from '../pages/loginPage/Login';
-import Landing from '../pages/landingPage/Landing';
+import About from '../pages/aboutPage/About';
 import PrivateRoute from '../app/PrivateRoute';
 export default function AppRoutes({ user }) {
     return (
         <Routes>
-            <Route path="/" element={<Navigate to="/landing" />} />
-            <Route path="/landing" element={<Landing />} />
+            <Route path="/" element={<Navigate to="/about" />} />
+            <Route path="/about" element={<About />} />
 
             <Route path="/login" element={user ? <Navigate to="/home" /> : <Login />} />
 
