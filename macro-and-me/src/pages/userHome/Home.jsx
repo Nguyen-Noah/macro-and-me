@@ -18,11 +18,11 @@ export default function Home() {
     };
 
 return (
-    <div className="flex flex-col items-center min-h-screen p-8 font-sans bg-gradient-to-tl from-slate-800 via-slate-600 to-slate-800">
+    <div className="flex flex-col items-center min-h-screen p-8 font-sans bg-gradient-to-tl from-slate-800 via-slate-600 to-slate-800 mb-14 pb-14">
         <div>
-            <h1>Welcome to your Home Dashboard</h1>
             <button onClick={handleLogout}>Logout</button>
         </div>
+
     <header className="flex justify-between items-center w-full max-w-xs">
         <button className="text-xl text-black">{'<'}</button>
         <h1 className="text-xl font-semibold text-black">Today</h1>
@@ -34,7 +34,7 @@ return (
         <MealSection />
     </div>
 
-    <footer className="w-full flex-shrink-0">
+    <footer className="w-full fixed bottom-0 shadow-md">
         <NavBar/>
     </footer>
 
