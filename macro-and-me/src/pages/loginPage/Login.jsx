@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { auth, provider } from "../../firebase";  
-import firebase from "firebase/compat/app"; 
-import "firebase/compat/auth"; 
+import { auth, provider } from '../../firebase'; 
+import { signInWithPopup, browserSessionPersistence, setPersistence } from "firebase/auth"; 
 
 export default function Login() {
     const [email, setEmail] = useState("");
@@ -13,17 +12,17 @@ export default function Login() {
     const [signUp, setSignUp] = useState(false);
 
     const handleAuth = () => {
-        auth.setPersistence(firebase.auth.Auth.Persistence.SESSION)  
+        setPersistence(auth, browserSessionPersistence)  
             .then(() => {
-                return auth.signInWithPopup(provider);  
+                return signInWithPopup(auth, provider);  
             })
             .then((result) => {
-                setUser(result.user);
-                navigate("/home");  
+                setUser(result.user); 
+                navigate("/home"); 
             })
             .catch((error) => {
                 console.error("Error during Google sign-in:", error);
-                setErrorMessage(error.message);  
+                setErrorMessage(error.message); 
             });
     };
 
@@ -33,7 +32,7 @@ export default function Login() {
         setErrorMessage(null);
 
         try {
-            await auth.setPersistence(firebase.auth.Auth.Persistence.SESSION); 
+            await  setPersistence(auth, browserSessionPersistence)
             let userCredential;
             if (signUp) {
                 userCredential = await auth.createUserWithEmailAndPassword(email, password);

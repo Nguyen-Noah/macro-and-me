@@ -74,14 +74,14 @@ export default function FoodSearch() {
         </button>
       </form>
 
-      {/* Display Results */}
+
       <div className="mt-8 w-full max-w-md">
         {loading && <p>Loading...</p>}
         {error && <p className="text-red-500">{error}</p>}
         {results.length > 0 && (
           <ul className="list-disc pl-5">
             {results.map((food) => {
-              const macros = getMacronutrients(food.foodNutrients); // Extract macronutrients
+              const macros = getMacronutrients(food.foodNutrients);
               return (
                 <li key={food.fdcId} className="mb-4">
                   <p><strong>{food.description}</strong></p>
