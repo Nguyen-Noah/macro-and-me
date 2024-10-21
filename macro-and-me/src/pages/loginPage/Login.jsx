@@ -1,8 +1,17 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { auth, provider } from '../../firebase'; 
-import { signInWithPopup, browserSessionPersistence, setPersistence } from "firebase/auth"; 
+import { provider } from '../../firebase'; 
+import { 
+    getAuth,
+    signInWithEmailAndPassword, 
+    createUserWithEmailAndPassword, 
+    signInWithPopup, 
+    browserSessionPersistence, 
+    setPersistence 
+} from "firebase/auth"; 
+import api from "../../utils/api";
 
+const auth = getAuth();
 export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -11,21 +20,28 @@ export default function Login() {
     const navigate = useNavigate();
     const [signUp, setSignUp] = useState(false);
 
-    const handleAuth = () => {
-        setPersistence(auth, browserSessionPersistence)  
-            .then(() => {
-                return signInWithPopup(auth, provider);  
-            })
-            .then((result) => {
-                setUser(result.user); 
-                navigate("/home"); 
-            })
-            .catch((error) => {
-                console.error("Error during Google sign-in:", error);
-                setErrorMessage(error.message); 
-            });
+    const sendUIDToBackend = async (uid) => {
+        console.log(uid);
+        try {
+            await api.post('/users', { uid });
+            console.log('UID sent to backend.');
+        } catch (error) {
+            console.error('Error sending UID to backend:', error.message);
+        }
     };
 
+    const handleAuth = async () => {
+        try {
+            await setPersistence(auth, browserSessionPersistence);
+            const result = signInWithPopup(auth, provider);
+            setUser(result.user);
+            await sendUIDToBackend(result.user.uid);
+            navigate("/home");
+        } catch (error) {
+            console.error("Error during Google login");
+            setErrorMessage(error.message);
+        }
+    };
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -35,14 +51,16 @@ export default function Login() {
             await  setPersistence(auth, browserSessionPersistence)
             let userCredential;
             if (signUp) {
-                userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                userCredential = await createUserWithEmailAndPassword(auth, email, password);
             } else {
-                userCredential = await auth.signInWithEmailAndPassword(email, password);
+                userCredential = await signInWithEmailAndPassword(auth, email, password);
             }
             setUser(userCredential.user);
-            navigate("/home");  
+            await sendUIDToBackend(userCredential.user.uid);
+            navigate("/home");
         } catch (error) {
-            setErrorMessage(error.message);
+            console.error(signUp ? "Error during Sign-Up: " : "Error during login: ", error.message);
+            setErrorMessage(signUp ? "Error creating account." : "Email invalid or password mismatch.");
         }
     };
 
