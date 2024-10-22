@@ -20,10 +20,9 @@ export default function Login() {
     const navigate = useNavigate();
     const [signUp, setSignUp] = useState(false);
 
-    const sendUIDToBackend = async (uid) => {
-        console.log(uid);
+    const sendUIDToBackend = async (firebaseUid) => {
         try {
-            await api.post('/users', { uid });
+            await api.post('/users', { firebaseUid });
             console.log('UID sent to backend.');
         } catch (error) {
             console.error('Error sending UID to backend:', error.message);

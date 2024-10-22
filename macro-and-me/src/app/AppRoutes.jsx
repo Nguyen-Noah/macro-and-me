@@ -7,6 +7,7 @@ import ImageUpload from '../pages/imageUpload';
 import Login from '../pages/loginPage/Login';
 import About from '../pages/aboutPage/About';
 import PrivateRoute from '../app/PrivateRoute';
+import LogMeal from '../pages/userHome/components/LogMeal';
 export default function AppRoutes({ user }) {
     return (
         <Routes>
@@ -27,6 +28,10 @@ export default function AppRoutes({ user }) {
             <Route
                 path="/imageUpload"
                 element={<PrivateRoute user={user}><ImageUpload /></PrivateRoute>}
+            />
+            <Route
+                path="/logMeal"
+                element={<PrivateRoute user={user}><LogMeal /></PrivateRoute>}
             />
         </Routes>
     );

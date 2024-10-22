@@ -1,13 +1,14 @@
 import User from "../models/User.js";
 
 export const createUser = async (req, res) => {
-    const { uid } = req.body;
+    const { firebaseUid } = req.body;
+    console.log(firebaseUid)
 
     try {
-        let user = await User.findOne({ firebaseUid: uid });
+        let user = await User.findOne({ firebaseUid });
 
         if (!user) {
-            user = new User({ firebaseUid: uid });
+            user = new User({ firebaseUid });
             await user.save();
         }
 

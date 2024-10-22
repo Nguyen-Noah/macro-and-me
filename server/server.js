@@ -5,6 +5,7 @@ const { json } = express;
 import userRoutes from './routes/userRoutes.js';
 import imageUpload from './routes/imageUpload.js'
 import connectDB from './config/databaseFactory.js';
+import mealRoutes from './routes/mealRoutes.js';
 connectDB();
 
 console.log(process.env.MONGO_URI)
@@ -17,8 +18,8 @@ app.use(cors());
 app.use(json());
 
 // Routes
-app.use('/api', userRoutes)
-app.use('/api', imageUpload)
+app.use('/api', userRoutes);
+app.use('/api', mealRoutes)
 
 // Start the server
 app.listen(PORT, () => {

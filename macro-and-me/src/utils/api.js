@@ -52,5 +52,5 @@ class API {
     }
 }
 
-const api = new API('http://localhost:5000/api');
+const api = new API('http://localhost:5000/api'); // <- put this in .env eventually
 export default api;
