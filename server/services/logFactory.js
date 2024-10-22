@@ -15,6 +15,7 @@ export const findOrCreateLog = async (userId)=> {
         } else {
             console.log('Existing daily log found:', dailyLog);
         }
+        
 
         return dailyLog;
     } catch (error) {

@@ -23,7 +23,7 @@ const LogMeal = () => {
                 setFirebaseUid(null);  // Set to null if no user is logged in
             }
         });
-    
+
         return () => unsubscribe();  // Cleanup subscription on unmount
       }, []);
 

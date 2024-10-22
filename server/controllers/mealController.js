@@ -5,7 +5,7 @@ import { findOrCreateLog } from "../services/logFactory.js";
 import { findOrCreateMeal } from "../services/mealFactory.js";
 
 export const createMeal = async (req, res) => {
-    const { firebaseUid, mealId, mealType, name, calories, fat, carbohydrates, protein } = req.body;
+    const { firebaseUid, mealType, name, calories, fat, carbohydrates, protein } = req.body;
 
     try {
         // check for the user
@@ -16,7 +16,7 @@ export const createMeal = async (req, res) => {
 
         const dailyLog = await findOrCreateLog(user._id);
         const newFood = await findOrCreateFood({ name, calories, fat, carbohydrates, protein });
-        const meal = await findOrCreateMeal(mealId, newFood._id);
+        const meal = await findOrCreateMeal(mealType, newFood._id);
 
         // set the selected meal in the log to this one then save
         dailyLog[mealType] = meal._id;

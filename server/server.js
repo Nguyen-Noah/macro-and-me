@@ -8,8 +8,6 @@ import connectDB from './config/databaseFactory.js';
 import mealRoutes from './routes/mealRoutes.js';
 connectDB();
 
-console.log(process.env.MONGO_URI)
-
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -19,7 +17,7 @@ app.use(json());
 
 // Routes
 app.use('/api', userRoutes);
-app.use('/api', mealRoutes)
+app.use('/api', mealRoutes);
 
 // Start the server
 app.listen(PORT, () => {
