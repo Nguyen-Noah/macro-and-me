@@ -1,18 +1,23 @@
+import './loadEnv.js';
 import express from 'express';
 import cors from 'cors';
 const { json } = express;
+import userRoutes from './routes/userRoutes.js';
+import imageUpload from './routes/imageUpload.js'
+import connectDB from './config/databaseFactory.js';
+import mealRoutes from './routes/mealRoutes.js';
+connectDB();
+
 const app = express();
 const PORT = process.env.PORT || 5000;
-require('dotenv').config();
 
 // Middleware
-app.use(cors()); // To allow requests from React frontend
-app.use(json()); // To parse JSON request bodies
+app.use(cors());
+app.use(json());
 
-// Define a simple route
-app.get('/api/greet', (req, res) => {
-    res.json({ message: 'Hello from Express backend!' });
-});
+// Routes
+app.use('/api', userRoutes);
+app.use('/api', mealRoutes);
 
 // Start the server
 app.listen(PORT, () => {

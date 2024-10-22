@@ -19,7 +19,7 @@ const NavBar = () => {
                 </svg>
             </button>
 
-            <Link to="/search">
+            <Link to="/logMeal">
                 <button className="bg-black p-2 rounded-full text-white add">
                     <svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" viewBox="0 0 24 24">
                         <path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 12h6m0 0h6m-6 0v6m0-6V6" />
