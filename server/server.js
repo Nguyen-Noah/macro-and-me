@@ -18,6 +18,7 @@ app.use(json());
 // Routes
 app.use('/api', userRoutes);
 app.use('/api', mealRoutes);
+app.use('/api', imageUpload);
 
 // Start the server
 app.listen(PORT, () => {
