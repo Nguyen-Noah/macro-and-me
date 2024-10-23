@@ -16,7 +16,7 @@ export default function FoodSearch() {
 
     try {
       const apiKey = process.env.REACT_APP_USDA_API_KEY; 
-      const apiUrl = `https://api.nal.usda.gov/fdc/v1/foods/search?query=${query}&api_key=${apiKey}`;
+      const apiUrl = `https://api.nal.usda.gov/fdc/v1/foods/search?query=${query}&api_key=${apiKey}&dataType=Foundation`;
       const response = await fetch(apiUrl);
       const data = await response.json();
 

@@ -12,31 +12,20 @@ const openai = new OpenAI({
 
 router.post('/upload', upload.single('image'), async (req, res) => {
     try {
-        const imageBuffer = fs.readFileSync(req.file.path);
-        const base64Image = imageBuffer.toString('base64');
+        const query = req.body.text;
+        console.log(req.body.text)
 
         const response = await openai.chat.completions.create({
             model: 'gpt-4o',
             messages: [
                 {
                     "role": "user",
-                    "content": [
-                        {
-                            "type": "text",
-                            "text:": "What is in this image?"
-                        },
-                        {
-                            "type": "image_url",
-                            "image_url": {
-                                "url": `data:image/jpeg;base64,${base64Image}`
-                            }
-                        }
-                    ]
+                    "content": query
                 },
             ],
         });
 
-        console.log(nutritionInfo)
+        console.log(response)
 
         const nutritionInfo = response.choices[0].message.content;
         res.json({ nutritionInfo });

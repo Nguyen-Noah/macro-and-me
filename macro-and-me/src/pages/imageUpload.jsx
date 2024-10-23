@@ -2,39 +2,44 @@ import React, { useState } from 'react';
 import api from '../utils/api';
 
 const ImageUpload = () => {
-    const [image, setImage] = useState(null);
-    const [nutritionInfo, setNutritionInfo] = useState(null);
+  const [inputText, setInputText] = useState('');
+  const [nutritionInfo, setNutritionInfo] = useState('');
 
-    const handleImageChange = (e) => {
-        setImage(e.target.files[0]);
+  const handleChange = (e) => {
+    setInputText(e.target.value);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await api.post('/upload', { text: inputText });
+      setNutritionInfo(response.data.nutritionInfo);
+    } catch (error) {
+      console.error('Error submitting text:', error);
     }
+  };
 
-    const handleImageUpload = async () => {
-        const formData = new FormData();
-        formData.append('image', image);
+  return (
+    <div>
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          value={inputText}
+          onChange={handleChange}
+          placeholder="Enter text here"
+        />
+        <button type="submit">Send to OpenAI</button>
+      </form>
 
-        try {
-            const response = await api.post('/upload', formData, {
-                headers: { 'Content-Type': 'multipart/form-data' },
-            });
-            setNutritionInfo(response.data.nutritionInfo);
-        } catch (error) {
-            console.error('Error uploading image', error);
-        }
-    };
-
-    return (
+      {nutritionInfo && (
         <div>
-          <input type="file" accept="image/*" onChange={handleImageChange} />
-          <button onClick={handleImageUpload}>Upload Image</button>
-          {nutritionInfo && (
-            <div>
-              <h2>Estimated Nutrition Information:</h2>
-              <p>{nutritionInfo}</p>
-            </div>
-          )}
+          <h2>OpenAI response:</h2>
+          <p>{nutritionInfo}</p>
         </div>
-      );
+      )}
+    </div>
+  );
 };
 
 export default ImageUpload;
