@@ -1,0 +1,19 @@
+{
+  "name": "tests",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha ./tests --recursive --timeout 15000 --exit"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "mocha": "10.8.2",
+    "mongodb-memory-server": "^10.1.2",
+    "mongoose": "8.8.0",
+    "supertest": "7.0.0"
+  },
+  "type": "module"
+}
