@@ -1,7 +1,8 @@
 import mongoose from "mongoose";
 import { MongoMemoryServer } from "mongodb-memory-server";
+import request from "supertest";
 import app from "../../server/server";
-import Food from "../../server/models/Food";
+import Food from "../../server/models/Food.js";
 
 let mongoServer;
 
@@ -21,5 +22,14 @@ afterAll(async () => {
 });
 
 describe("Food model", () => {
-
+    test("It should create a new food", async () => {
+        const foodData = {
+            name: "Banana",
+            calories: 120,
+            fat: 1,
+            carbohydrates: 9,
+            protein: 0
+        }
+        const response = await request(app).post("/")
+    })
 })

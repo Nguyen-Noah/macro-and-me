@@ -1,7 +1,8 @@
 import mongoose from "mongoose";
 import { MongoMemoryServer } from "mongodb-memory-server";
+import request from "supertest";
 import app from "../../server/server";
-import Recipe from "../../server/models/Recipe";
+import Recipe from "../../server/models/Recipe.js";
 
 let mongoServer;
 
