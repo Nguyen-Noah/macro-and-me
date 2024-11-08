@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { provider } from '../../firebase'; 
+import { provider } from '../../firebaseConfig'; 
 import { 
     getAuth,
     signInWithEmailAndPassword, 
@@ -11,14 +11,13 @@ import {
 } from "firebase/auth"; 
 import api from "../../utils/api";
 
-const auth = getAuth();
 export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [user, setUser] = useState(null);
     const [errorMessage, setErrorMessage] = useState(null);
     const navigate = useNavigate();
     const [signUp, setSignUp] = useState(false);
+    const auth = getAuth();
 
     const sendUIDToBackend = async (firebaseUid) => {
         try {
@@ -33,7 +32,6 @@ export default function Login() {
         try {
             await setPersistence(auth, browserSessionPersistence);
             const result = signInWithPopup(auth, provider);
-            setUser(result.user);
             await sendUIDToBackend(result.user.uid);
             navigate("/home");
         } catch (error) {
@@ -54,7 +52,6 @@ export default function Login() {
             } else {
                 userCredential = await signInWithEmailAndPassword(auth, email, password);
             }
-            setUser(userCredential.user);
             await sendUIDToBackend(userCredential.user.uid);
             navigate("/home");
         } catch (error) {
