@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { provider } from '../../firebase'; 
+import { provider } from '../../firebaseConfig'; 
 import { 
     getAuth,
     signInWithEmailAndPassword, 
@@ -11,18 +11,18 @@ import {
 } from "firebase/auth"; 
 import api from "../../utils/api";
 
-const auth = getAuth();
 export default function Login() {
+    const [displayName, setDisplayName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [user, setUser] = useState(null);
     const [errorMessage, setErrorMessage] = useState(null);
     const navigate = useNavigate();
     const [signUp, setSignUp] = useState(false);
+    const auth = getAuth();
 
-    const sendUIDToBackend = async (firebaseUid) => {
+    const sendUIDToBackend = async (firebaseUid, displayName) => {
         try {
-            await api.post('/users', { firebaseUid });
+            await api.post('/users', { firebaseUid, displayName });
             console.log('UID sent to backend.');
         } catch (error) {
             console.error('Error sending UID to backend:', error.message);
@@ -32,9 +32,8 @@ export default function Login() {
     const handleAuth = async () => {
         try {
             await setPersistence(auth, browserSessionPersistence);
-            const result = signInWithPopup(auth, provider);
-            setUser(result.user);
-            await sendUIDToBackend(result.user.uid);
+            const result = await signInWithPopup(auth, provider);
+            await sendUIDToBackend(result.user.uid, result.user.displayName || "");
             navigate("/home");
         } catch (error) {
             console.error("Error during Google login");
@@ -51,11 +50,11 @@ export default function Login() {
             let userCredential;
             if (signUp) {
                 userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                await sendUIDToBackend(userCredential.user.uid, displayName);
             } else {
                 userCredential = await signInWithEmailAndPassword(auth, email, password);
+                await sendUIDToBackend(userCredential.user.uid);
             }
-            setUser(userCredential.user);
-            await sendUIDToBackend(userCredential.user.uid);
             navigate("/home");
         } catch (error) {
             console.error(signUp ? "Error during Sign-Up: " : "Error during login: ", error.message);
@@ -74,6 +73,22 @@ export default function Login() {
                         {signUp ? "Sign Up" : "Login"}
                     </h1>
                     <form onSubmit={handleSubmit} className="bg-slate-700 bg-opacity-20 p-6 rounded-xl shadow-inner w-80">
+                        {signUp && (
+                                <div className="mb-4">
+                                    <label htmlFor="displayName" className="block text-stone-100 mb-2">
+                                        Username
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="displayName"
+                                        name="displayName"
+                                        value={displayName}
+                                        onChange={(event) => setDisplayName(event.target.value)}
+                                        className="w-full p-2 rounded-md text-stone-800 border-2 focus:border-stone-700 focus:outline-none"
+                                        required
+                                    />
+                                </div>
+                            )}
                         <div className="mb-4">
                             <label htmlFor="email" className="block text-stone-100 mb-2">
                                 Email
@@ -109,7 +124,18 @@ export default function Login() {
                         >
                             {signUp ? "Sign Up" : "Login"}
                         </button>
-                        <div className="flex flex-col justify-center items-center">
+                        <p className="mt-4 text-stone-100">
+                            {signUp ? "Already have an account?" : "Don't have an account?"}
+                            <button
+                                type="button"
+                                className="text-blue-500 hover:underline ml-2"
+                                onClick={() => setSignUp(!signUp)}
+                            >
+                                {signUp ? "Login" : "Sign Up"}
+                            </button>
+                        </p>
+                    </form>
+                    <div className="flex flex-col justify-center items-center">
                             <button
                                 className="bg-stone-100 text-stone-50 py-2 rounded-lg mt-3 hover:bg-stone-200 hover:rounded-xl transition transform hover:-translate-y-1 motion-reduce:transition-none motion-reduce:hover:transform-none"
                                 onClick={handleAuth}
@@ -126,17 +152,6 @@ export default function Login() {
                                 </div>
                             </button>
                         </div>
-                        <p className="mt-4 text-stone-100">
-                            {signUp ? "Already have an account?" : "Don't have an account?"}
-                            <button
-                                type="button"
-                                className="text-blue-500 hover:underline ml-2"
-                                onClick={() => setSignUp(!signUp)}
-                            >
-                                {signUp ? "Login" : "Sign Up"}
-                            </button>
-                        </p>
-                    </form>
                 </div>
             </div>
         </div>

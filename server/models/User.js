@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
     firebaseUid: {type: String, required: true, unique: true},
+    displayName: { type: String },
     daily_logs: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Log' }],
     recipes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Recipe' }]
 }, { timestamps: true });

@@ -2,7 +2,7 @@ import MacroDataSection from "./components/MacroDataSection";
 import MealSection from "./components/MealSection";
 import NavBar from "./components/NavBar";
 import { useNavigate } from "react-router-dom";
-import { auth } from "../../firebase";
+import { auth } from "../../firebaseConfig";
 
 export default function Home() {
     

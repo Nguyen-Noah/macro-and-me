@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import React, { useState } from 'react';
 import api from '../../../utils/api';
+import { useAuth } from '../../../AuthContext';
 
 const LogMeal = () => {
+    const user = useAuth().user;
     const [meal, setMeal] = useState({
         name: '',
         calories: '',
@@ -11,42 +12,7 @@ const LogMeal = () => {
         protein: '',
     });
     const [mealType, setMealType] = useState('breakfast');
-    const [mealId, setMealId] = useState(null); // <- this is generates/retrieved from Mongo
-    const [firebaseUid, setFirebaseUid] = useState(null);
-
-    useEffect(() => {
-        const auth = getAuth();
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            if (user) {
-                setFirebaseUid(user.uid);  // Set the firebaseUid when user is logged in
-            } else {
-                setFirebaseUid(null);  // Set to null if no user is logged in
-            }
-        });
-
-        return () => unsubscribe();  // Cleanup subscription on unmount
-      }, []);
-
-    useEffect(() => {
-        const fetchExistingMeal = async () => {
-            if (!firebaseUid) return;
-
-            try {
-                const response = api.post('/get_meal',
-                    { firebaseUid, mealType },
-                    { headers: { 'Content-Type': 'application/json' }}
-                );
-
-                if (response.status === 200) {
-                    setMealId((await response).data.mealId);
-                }
-            } catch (error) {
-                console.error('Error fetching meal:', error);
-            }
-        };
-
-        fetchExistingMeal();
-    }, [firebaseUid, mealType]);
+    const firebaseUid = user.uid;
 
     const handleChange = (e) => {
         setMeal({
@@ -63,15 +29,9 @@ const LogMeal = () => {
         e.preventDefault();
 
         try {
-            const auth = getAuth();
-            const user = auth.currentUser;
-
             if (user) {
-                setFirebaseUid(user.uid);
-
-                // Include the meal type and UID in the request
                 const response = await api.post('/log_meal',
-                    { ...meal, mealType, firebaseUid, mealId } ,
+                    { ...meal, mealType, firebaseUid },
                     { headers: { 'Content-Type': 'application/json' }}
                 );
                 if (response.status === 201) {
