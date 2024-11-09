@@ -1,11 +1,33 @@
 import { Link } from "react-router-dom";
-import {useState} from "react";
+import {useState, useRef, useEffect} from "react";
 
 const NavBar = () => {
+    //Showing additional buttons for the + (Add Button)
     const [showAdditionalButtons, setShowAdditionalButtons] = useState(false);
+    const addButtonRef = useRef(null);
     const toggleAdditionalButtons = () => {
         setShowAdditionalButtons((prev) => !prev);
     };
+    //Hiding Food adding buttons with event handler
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if(addButtonRef.current && !addButtonRef.current.contains(event.target)) {
+                setShowAdditionalButtons(false);
+            }
+        }
+
+        if (showAdditionalButtons){
+            document.addEventListener("mousedown", handleClickOutside);
+        }
+        else{
+            document.addEventListener("mousedown", handleClickOutside);
+        }
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        }
+
+    }, [showAdditionalButtons]);
+
 
 
     return (
@@ -27,7 +49,7 @@ const NavBar = () => {
         
 
             {/* Add Button with additional buttons above */}
-            <div className="relative flex flex-col items-center">
+            <div className="relative flex flex-col items-center" ref={addButtonRef}>
                 {/* Additional Buttons */}
                 {showAdditionalButtons && (
                     <div className="absolute -top-28 left-8 transform -translate-x-1/2 flex flex-row gap-6">
