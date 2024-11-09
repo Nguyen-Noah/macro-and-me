@@ -37,7 +37,6 @@ export const createMeal = async (req, res) => {
 
 export const getMealByType = async (req, res) => {
     const { firebaseUid, mealType, date } = req.body;
-    console.log()
 
     try {
         const user = await User.findOne({ firebaseUid });
