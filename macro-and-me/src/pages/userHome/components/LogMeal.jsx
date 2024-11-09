@@ -3,8 +3,7 @@ import api from '../../../utils/api';
 import { useAuth } from '../../../AuthContext';
 
 const LogMeal = () => {
-    const user = useAuth();
-    console.log(user);
+    const user = useAuth().user;
     const [meal, setMeal] = useState({
         name: '',
         calories: '',
@@ -13,7 +12,7 @@ const LogMeal = () => {
         protein: '',
     });
     const [mealType, setMealType] = useState('breakfast');
-    const [firebaseUid, setFirebaseUid] = useState(null);
+    const firebaseUid = user.uid;
 
     const handleChange = (e) => {
         setMeal({
@@ -31,8 +30,6 @@ const LogMeal = () => {
 
         try {
             if (user) {
-                setFirebaseUid(user.uid);
-
                 const response = await api.post('/log_meal',
                     { ...meal, mealType, firebaseUid },
                     { headers: { 'Content-Type': 'application/json' }}

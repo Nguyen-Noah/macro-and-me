@@ -5,7 +5,6 @@ export const createUser = async (req, res) => {
 
     try {
         let user = await User.findOne({ firebaseUid });
-        console.log(displayName)
 
         if (!user) {
             user = new User({ firebaseUid, displayName });
