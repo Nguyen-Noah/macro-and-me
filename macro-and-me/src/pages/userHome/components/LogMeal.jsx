@@ -4,6 +4,7 @@ import { useAuth } from '../../../AuthContext';
 
 const LogMeal = () => {
     const user = useAuth();
+    console.log(user);
     const [meal, setMeal] = useState({
         name: '',
         calories: '',

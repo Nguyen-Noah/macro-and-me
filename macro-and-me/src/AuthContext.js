@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./firebaseConfig.js";
 
 const AuthContext = createContext();
@@ -14,7 +14,7 @@ export const AuthProvider = ({ children }) => {
           setUser(currentUser);
         });
         return () => unsubscribe();
-    }, [auth]);
+    }, [auth]); // eslint-disable-line react-hooks/exhaustive-deps
 
     return <AuthContext.Provider value={{ user }}>{children}</AuthContext.Provider>;
 };
