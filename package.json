@@ -17,7 +17,8 @@
     "start:backend": "nodemon server/server.js",
     "start:frontend-dev": "npm run start --prefix macro-and-me",
     "start:backend-dev": "npm run start --prefix server",
-    "lint": "npx eslint ."
+    "lint": "npx eslint .",
+    "ia": "npm install && npm install --prefix macro-and-me && npm install --prefix server"
   },
   "keywords": [],
   "author": "",
