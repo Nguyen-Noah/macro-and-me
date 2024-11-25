@@ -1,25 +1,4 @@
-import mongoose from "mongoose";
-import { MongoMemoryServer } from "mongodb-memory-server";
-import request from "supertest";
-import app from "../../server/server";
 import Meal from "../../server/models/Meal.js";
-
-let mongoServer;
-
-beforeAll(async () => {
-    mongoServer = await MongoMemoryServer.create();
-    const uri = mongoServer.getUri();
-    await mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-});
-
-afterEach(async () => {
-    await Meal.deleteMany({});
-});
-
-afterAll(async () => {
-    await mongoose.disconnect();
-    await mongoServer.stop();
-});
 
 describe("Meal model", () => {
 

@@ -1,35 +1,37 @@
-import mongoose from "mongoose";
-import { MongoMemoryServer } from "mongodb-memory-server";
-import request from "supertest";
-import app from "../../server/server";
 import Food from "../../server/models/Food.js";
 
-let mongoServer;
+describe("createOrFindFood", () => {
+    it("should create a new food item if it does not exist", async() => {
+        const foodData = {
+            name: "Apple",
+            calories: 95,
+            fat: 0,
+            carbohydrates: 25,
+            protein: 0
+        };
 
-beforeAll(async () => {
-    mongoServer = await MongoMemoryServer.create();
-    const uri = mongoServer.getUri();
-    await mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-});
+        const food = await createOrFindFood({ ...foodData });
+        
+        const foundFood = await Food.findOne({ name: "Apple" });
+        expect(foundFood).toBeDefined();
+        expect(foundFood.calories).toBe(95);
+    })
 
-afterEach(async () => {
-    await Food.deleteMany({});
-});
-
-afterAll(async () => {
-    await mongoose.disconnect();
-    await mongoServer.stop();
-});
-
-describe("Food model", () => {
-    test("It should create a new food", async () => {
+    it("should return an existing food item if it already exists", async() => {
         const foodData = {
             name: "Banana",
-            calories: 120,
-            fat: 1,
-            carbohydrates: 9,
-            protein: 0
-        }
-        const response = await request(app).post("/")
+            calories: 105,
+            fat: 0,
+            carbohydrates: 27,
+            protein: 1
+        };
+
+        const existingFood = new Food(foodData);
+        await existingFood.save();
+
+        const foundFood = await createOrFindFood(foodData.name, foodData.calories, foodData.fat, foodData.carbohydrates, foodData.protein);
+
+        expect(foundFood._id.toString()).toBe(existingFood._id.toString());
+        expect(foundFood.calories).toBe(105);
     })
 })
