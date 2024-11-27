@@ -1,31 +1,58 @@
-import e from "express";
-import multer from "multer";
-import fs from 'fs';
+import e from 'express';
 import OpenAI from 'openai';
+import { zodResponseFormat } from 'openai/helpers/zod';
+import { z } from 'zod';
+import multer from 'multer';
 
+const upload = multer({ storage: multer.memoryStorage() });
 const router = e.Router();
 
-const upload = multer({ dest: 'uploads/' });
+const Nutrition = z.object({
+    calories: z.number(),
+    fat: z.number(),
+    carbohydrates: z.number(),
+    protein: z.number()
+});
+
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY
 });
 
 router.post('/upload', upload.single('image'), async (req, res) => {
     try {
-        const query = req.body.text;
-        console.log(req.body.text)
+        if (!req.file) {
+            return res.status(500).json({ error: 'No file uploaded' });
+        }
+        const image = req.file;
+        const text = req.body.text;
 
+        console.log(text)
+
+        const mimeType = image.mimetype;
+        const base64Image = image.buffer.toString('base64');
+
+        console.log('Sending to OpenAI...');
         const response = await openai.chat.completions.create({
             model: 'gpt-4o',
             messages: [
                 {
-                    "role": "user",
-                    "content": query
+                    role: "user",
+                    content: [
+                        {
+                            type: "text",
+                            text: `${text}`
+                        },
+                        {
+                            type: "image_url",
+                            image_url: {
+                                url: `data:${mimeType};base64,${base64Image}`
+                            }
+                        }
+                    ]
                 },
             ],
+            response_format: zodResponseFormat(Nutrition, 'nutrition')
         });
-
-        console.log(response)
 
         const nutritionInfo = response.choices[0].message.content;
         res.json({ nutritionInfo });
