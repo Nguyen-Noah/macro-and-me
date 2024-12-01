@@ -51,15 +51,6 @@ const calculateDailyTotal = (dayMeals) => {
     );
 };
 
-// used to make the date the key for each day
-const restructureLogs = (logs) => {
-    return logs.reduce((acc, log) => {
-        const dateKey = new Date(log.date).toISOString().split('T')[0];
-        acc[dateKey] = log;
-        return acc;
-    }, {});
-};
-
 // main function
 const getLogs = async (userId) => {
     try {
@@ -85,7 +76,7 @@ const getLogs = async (userId) => {
             })
         );
 
-        return restructureLogs(results);
+        return results;
     } catch (error) {
         console.error('Error fetching logs:', error);
     }
