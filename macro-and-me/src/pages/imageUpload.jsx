@@ -67,7 +67,6 @@ const ImageUpload = () => {
                     />
                 </div>
             )}
-
             {nutritionInfo && (
                 <div>
                     <h2>OpenAI response:</h2>
