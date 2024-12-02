@@ -99,6 +99,7 @@ const NavBar = () => {
                         </button>
                     </div>
 
+
                     <button className="p-2 recipes">{ICON_BOOK}</button>
                     <button className="p-2 profile">{ICON_USER}</button>
                 </div>

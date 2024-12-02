@@ -6,6 +6,7 @@ import userRoutes from './routes/userRoutes.js';
 import imageUpload from './routes/imageUpload.js'
 import connectDB from './config/databaseFactory.js';
 import mealRoutes from './routes/mealRoutes.js';
+import logRoutes from './routes/logRoutes.js';
 connectDB();
 
 const app = express();
@@ -19,6 +20,7 @@ app.use(json());
 app.use('/api', userRoutes);
 app.use('/api', mealRoutes);
 app.use('/api', imageUpload);
+app.use('/api', logRoutes);
 
 // Start the server
 app.listen(PORT, () => {
