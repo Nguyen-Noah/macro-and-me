@@ -3,14 +3,19 @@ import Meal from "../models/Meal.js";
 
 export const findOrCreateMeal = async (mealType, newFoodId) => {
     try {
-        const query = {}
-        query[mealType] = { $ne: null };
+        const date = new Date();
+        date.setHours(0, 0, 0, 0);
+
+        const query = {
+            [mealType]: { $ne: null },
+            date: date
+        }
 
         const result = await Log.findOne(query).populate(mealType);
 
         let meal;
         if (result) {
-            console.log(`Found log with ${mealType}`, result[mealType]);
+            console.log(`Found log with ${mealType} on ${date}`, result[mealType]);
             meal = result[mealType];
             meal.obj.push(newFoodId);
         } else {
