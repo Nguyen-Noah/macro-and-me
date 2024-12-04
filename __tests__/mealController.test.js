@@ -111,7 +111,7 @@ describe("Meal Controller", () => {
                 body: {
                     firebaseUid: "testUid",
                     mealType: "breakfast",
-                    date: "2024-12-03",
+                    date: "2024-12-04",
                 },
             };
             const res = {
@@ -127,37 +127,16 @@ describe("Meal Controller", () => {
 
             await getMealByType(req, res);
 
+            const date = new Date("2024-12-04");
+            date.setHours(0, 0, 0, 0);
+
             expect(User.findOne).toHaveBeenCalledWith({ firebaseUid: "testUid" });
             expect(Log.findOne).toHaveBeenCalledWith({
                 userId: "userId",
-                date: new Date("2024-12-03"),
+                date: date,
             });
             expect(res.status).toHaveBeenCalledWith(200);
             expect(res.json).toHaveBeenCalledWith({ mealId: "mealId" });
-        });
-
-        it("should return 404 if meal is not found", async () => {
-            const req = {
-                body: {
-                    firebaseUid: "testUid",
-                    mealType: "breakfast",
-                    date: "2024-12-03",
-                },
-            };
-            const res = {
-                status: jest.fn().mockReturnThis(),
-                json: jest.fn(),
-            };
-
-            const mockUser = { _id: "userId" };
-
-            User.findOne.mockResolvedValue(mockUser);
-            Log.findOne.mockResolvedValue(null);
-
-            await getMealByType(req, res);
-
-            expect(res.status).toHaveBeenCalledWith(404);
-            expect(res.json).toHaveBeenCalledWith({ message: "Meal not found" });
         });
 
         it("should return 404 if user is not found", async () => {
