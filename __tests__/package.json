@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "mongodb-memory-server": "^10.1.2",
+    "mongoose": "^8.8.3"
+  },
+  "type": "module",
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}

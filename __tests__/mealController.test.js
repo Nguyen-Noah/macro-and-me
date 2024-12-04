@@ -1,0 +1,180 @@
+import { jest } from '@jest/globals';
+
+// Mock dependencies using jest.unstable_mockModule
+jest.unstable_mockModule("../server/models/User.js", () => ({
+    default: {
+        findOne: jest.fn(), // Mock the findOne method
+    },
+}));
+
+jest.unstable_mockModule("../server/models/Log.js", () => ({
+    default: {
+        findOne: jest.fn(),
+    },
+}));
+
+jest.unstable_mockModule("../server/services/foodFactory.js", () => ({
+    findOrCreateFood: jest.fn(),
+}));
+
+jest.unstable_mockModule("../server/services/logFactory.js", () => ({
+    findOrCreateLog: jest.fn(),
+}));
+
+jest.unstable_mockModule("../server/services/mealFactory.js", () => ({
+    findOrCreateMeal: jest.fn(),
+}));
+
+// Import dependencies and the controller
+const { createMeal, getMealByType } = await import("../server/controllers/mealController.js");
+const User = (await import("../server/models/User.js")).default;
+const Log = (await import("../server/models/Log.js")).default;
+const { findOrCreateFood } = await import("../server/services/foodFactory.js");
+const { findOrCreateLog } = await import("../server/services/logFactory.js");
+const { findOrCreateMeal } = await import("../server/services/mealFactory.js");
+
+describe("Meal Controller", () => {
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+
+    describe("createMeal", () => {
+        it("should create a meal and update user's daily log", async () => {
+            const req = {
+                body: {
+                    firebaseUid: "testUid",
+                    mealType: "breakfast",
+                    name: "Oatmeal",
+                    calories: 150,
+                    fat: 3,
+                    carbohydrates: 27,
+                    protein: 5,
+                },
+            };
+            const res = {
+                status: jest.fn().mockReturnThis(),
+                json: jest.fn(),
+            };
+
+            const mockUser = { _id: "userId", daily_logs: [], save: jest.fn() };
+            const mockLog = { _id: "logId", breakfast: null, save: jest.fn() };
+            const mockFood = { _id: "foodId", name: "Oatmeal" };
+            const mockMeal = { _id: "mealId" };
+
+            User.findOne.mockResolvedValue(mockUser);
+            findOrCreateLog.mockResolvedValue(mockLog);
+            findOrCreateFood.mockResolvedValue(mockFood);
+            findOrCreateMeal.mockResolvedValue(mockMeal);
+
+            await createMeal(req, res);
+
+            expect(User.findOne).toHaveBeenCalledWith({ firebaseUid: "testUid" });
+            expect(findOrCreateLog).toHaveBeenCalledWith("userId");
+            expect(findOrCreateFood).toHaveBeenCalledWith({
+                name: "Oatmeal",
+                calories: 150,
+                fat: 3,
+                carbohydrates: 27,
+                protein: 5,
+            });
+            expect(findOrCreateMeal).toHaveBeenCalledWith("breakfast", "foodId");
+            expect(mockLog.save).toHaveBeenCalled();
+            expect(mockUser.save).toHaveBeenCalled();
+            expect(res.status).toHaveBeenCalledWith(201);
+            expect(res.json).toHaveBeenCalledWith({
+                message: "Meal logged successfully!",
+                food: mockFood,
+            });
+        });
+
+        it("should return 404 if user is not found", async () => {
+            const req = {
+                body: { firebaseUid: "testUid" },
+            };
+            const res = {
+                status: jest.fn().mockReturnThis(),
+                json: jest.fn(),
+            };
+
+            User.findOne.mockResolvedValue(null);
+
+            await createMeal(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(404);
+            expect(res.json).toHaveBeenCalledWith({ message: "User not found" });
+        });
+    });
+
+    describe("getMealByType", () => {
+        it("should return a meal by type for the given date", async () => {
+            const req = {
+                body: {
+                    firebaseUid: "testUid",
+                    mealType: "breakfast",
+                    date: "2024-12-03",
+                },
+            };
+            const res = {
+                status: jest.fn().mockReturnThis(),
+                json: jest.fn(),
+            };
+
+            const mockUser = { _id: "userId" };
+            const mockLog = { breakfast: "mealId" };
+
+            User.findOne.mockResolvedValue(mockUser);
+            Log.findOne.mockResolvedValue(mockLog);
+
+            await getMealByType(req, res);
+
+            expect(User.findOne).toHaveBeenCalledWith({ firebaseUid: "testUid" });
+            expect(Log.findOne).toHaveBeenCalledWith({
+                userId: "userId",
+                date: new Date("2024-12-03"),
+            });
+            expect(res.status).toHaveBeenCalledWith(200);
+            expect(res.json).toHaveBeenCalledWith({ mealId: "mealId" });
+        });
+
+        it("should return 404 if meal is not found", async () => {
+            const req = {
+                body: {
+                    firebaseUid: "testUid",
+                    mealType: "breakfast",
+                    date: "2024-12-03",
+                },
+            };
+            const res = {
+                status: jest.fn().mockReturnThis(),
+                json: jest.fn(),
+            };
+
+            const mockUser = { _id: "userId" };
+
+            User.findOne.mockResolvedValue(mockUser);
+            Log.findOne.mockResolvedValue(null);
+
+            await getMealByType(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(404);
+            expect(res.json).toHaveBeenCalledWith({ message: "Meal not found" });
+        });
+
+        it("should return 404 if user is not found", async () => {
+            const req = {
+                body: { firebaseUid: "testUid" },
+            };
+            const res = {
+                status: jest.fn().mockReturnThis(),
+                json: jest.fn(),
+            };
+
+            User.findOne.mockResolvedValue(null);
+
+            await getMealByType(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(404);
+            expect(res.json).toHaveBeenCalledWith({ message: "User not found" });
+        });
+    });
+});
