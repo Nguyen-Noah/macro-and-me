@@ -71,6 +71,24 @@ export default function FoodSearch({ closePopup }) {
         if (!addedFoods.some((addedFood) => addedFood.fdcId === food.fdcId)) {
             setAddedFoods((prev) => [...prev, food]);
         }
+
+        const relevantNutrients = food.foodNutrients
+            .filter((nutrient) => [1008, 1003, 1004, 1005].includes(nutrient.nutrientId))
+            .reduce((acc, nutrient) => {
+                const key = nutrientMap[nutrient.nutrientId];
+                acc[key] = `${nutrient.value} ${nutrient.unitName.toLowerCase()}`;
+                return acc;
+            }, {});
+
+        const logData = {
+            Name: food.description,
+            Calories: relevantNutrients.calories || 'N/A',
+            Protein: relevantNutrients.protein || 'N/A',
+            Fat: relevantNutrients.fat || 'N/A',
+            Carbs: relevantNutrients.carbs || 'N/A',
+        };
+
+        console.table(logData);
     };
 
     const nutrientMap = {
@@ -100,7 +118,7 @@ export default function FoodSearch({ closePopup }) {
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-            <div className="bg-slate-700 w-full max-w-lg p-6 rounded-md shadow-lg relative">
+            <div className="bg-slate-400 w-full max-w-lg p-6 rounded-md shadow-lg relative">
                 <button
                     onClick={closePopup}
                     className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
@@ -142,7 +160,7 @@ export default function FoodSearch({ closePopup }) {
                                             </div>
                                             <button
                                                 onClick={() => handleAddFood(food)}
-                                                className="bg-green-500 text-white rounded-full w-10 h-10 flex items-center justify-center text-2xl ml-4 flex-shrink-0"
+                                                className="bg-green-500 text-white rounded-full w-12 h-12 flex items-center justify-center text-xl ml-4 flex-shrink-0"
                                                 title="Add to Homepage"
                                             >
                                                 +
