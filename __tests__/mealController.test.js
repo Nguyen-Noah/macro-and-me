@@ -1,9 +1,8 @@
 import { jest } from '@jest/globals';
 
-// Mock dependencies using jest.unstable_mockModule
 jest.unstable_mockModule("../server/models/User.js", () => ({
     default: {
-        findOne: jest.fn(), // Mock the findOne method
+        findOne: jest.fn(),
     },
 }));
 
@@ -25,7 +24,6 @@ jest.unstable_mockModule("../server/services/mealFactory.js", () => ({
     findOrCreateMeal: jest.fn(),
 }));
 
-// Import dependencies and the controller
 const { createMeal, getMealByType } = await import("../server/controllers/mealController.js");
 const User = (await import("../server/models/User.js")).default;
 const Log = (await import("../server/models/Log.js")).default;
