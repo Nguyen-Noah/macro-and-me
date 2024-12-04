@@ -44,7 +44,7 @@ const NavBar = () => {
     const handleClick = (button) => {
         switch (button) {
             case "Food Search":
-                openModal(<FoodSearch />);
+                openModal(<FoodSearch  closePopup={closeModal}/>);
                 break;
             case "Image Search":
                 openModal(<ImageUpload />);
