@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import api from '../../../../utils/api'
+import api from '../../../../utils/api';
 
 export default function FoodDetails({ foodId, handleBackToSearch, user }) {
     const [foodDetails, setFoodDetails] = useState(null);
@@ -21,8 +21,10 @@ export default function FoodDetails({ foodId, handleBackToSearch, user }) {
                 const appKey = process.env.REACT_APP_NUTRITIONIX_APP_KEY;
 
                 let response;
-                if (foodId.startsWith('nix_item_id_')) {
-                    // Branded food with `nix_item_id`
+
+                // Check if `foodId` is a natural language query or an ID
+                if (foodId.startsWith('nix_item_id_') || foodId.match(/^[a-f0-9]{24}$/)) {
+                    // Branded food or specific item ID
                     response = await fetch(
                         `https://trackapi.nutritionix.com/v2/search/item?nix_item_id=${foodId}`,
                         {
@@ -33,15 +35,17 @@ export default function FoodDetails({ foodId, handleBackToSearch, user }) {
                         }
                     );
                 } else {
-                    // Common food, use `natural/nutrients` endpoint
+                    // Common food, treat `foodId` as a natural language query
                     response = await fetch(`https://trackapi.nutritionix.com/v2/natural/nutrients`, {
                         method: 'POST',
                         headers: {
+                            'Content-Type': 'application/json',
                             'x-app-id': appId,
                             'x-app-key': appKey,
-                            'Content-Type': 'application/json',
                         },
-                        body: JSON.stringify({ query: foodId }),
+                        body: JSON.stringify({
+                            query: foodId, // Pass the natural language query
+                        }),
                     });
                 }
 
@@ -50,6 +54,8 @@ export default function FoodDetails({ foodId, handleBackToSearch, user }) {
                 }
 
                 const data = await response.json();
+                console.log("API Response:", data); // Debugging log
+
                 const food = data.foods ? data.foods[0] : data.food;
                 setFoodDetails(food);
                 setMeal({

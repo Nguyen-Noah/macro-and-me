@@ -7,7 +7,7 @@ export default function FoodSearch({ closePopup }) {
     const [results, setResults] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
-    const [selectedFood, setSelectedFood] = useState(null); 
+    const [selectedFood, setSelectedFood] = useState(null);
     const user = useAuth().user;
 
     const handleSubmit = async (e) => {
@@ -51,7 +51,6 @@ export default function FoodSearch({ closePopup }) {
 
     const handleSelectFood = (food) => {
         const idOrName = food.nix_item_id || food.food_name;
-        console.log("Selected Food ID or Name:", idOrName); 
         setSelectedFood(idOrName);
     };
 
