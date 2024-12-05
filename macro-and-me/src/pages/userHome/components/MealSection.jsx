@@ -44,11 +44,23 @@ const MealSection = () => {
     };
 
     const saveFoodChanges = async () => {
-        /*
-        Not my job, Noah Jobs
-        */
-        setShowError(true);
-        console.log("Not Implemented Sorry buddy");
+        const updatedFood = {
+            calories: parseInt(selectedFood.calories),
+            fat: parseInt(selectedFood.fat),
+            protein: parseInt(selectedFood.protein),
+            carbohydrates: parseInt(selectedFood.carbohydrates)
+        };
+
+        console.log(updatedFood)
+        try {
+            if (user) {
+                const foodId = selectedFood._id;
+                const response = await api.put('/food', { foodId, updatedFood });
+                console.log(response)
+            }
+        } catch (error) {
+
+        }
     };
 
     useEffect(() => {
