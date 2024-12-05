@@ -1,9 +1,13 @@
 import api from "../../../utils/api";
 import { useAuth } from "../../../AuthContext";
 import { useState, useEffect } from "react";
-import FoodModal from "./FoodModal"; // Import the FoodModal component
+import FoodModal from "./FoodModal"; 
+import { useRefresh } from "../context/RefreshContext";
+
 
 const MealSection = () => {
+    const { triggerRefresh, refreshKey } = useRefresh();
+    
     const [showError, setShowError] = useState(false);
     const [logs, setLogs] = useState([]);
     const [editedLogs, setEditedLogs] = useState({});
@@ -58,6 +62,7 @@ const MealSection = () => {
                 console.log("Food changes saved successfully:", response.data);
                 // Close modal after saving
                 setShowModal(false);
+                triggerRefresh();
             }
         } catch (error) {
             console.error("Error saving food changes:", error);
@@ -67,7 +72,7 @@ const MealSection = () => {
 
     useEffect(() => {
         fetchLogs();
-    }, []);
+    }, [refreshKey]);
 
     return (
         <section className="px-6 py-2">

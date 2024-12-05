@@ -3,12 +3,15 @@ import { Doughnut } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import api from "../../../utils/api";
 import { useAuth } from "../../../AuthContext";
+import { useRefresh } from "../context/RefreshContext";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const MacroDataSection = () => {
     const user = useAuth().user;
     const firebaseUid = user.uid;
+
+    const { refreshKey } = useRefresh(); // Access refreshKey from the RefreshContext
 
     const [macros, setMacros] = useState({
         calories: { label: "Kcal", current: 0, max: 2000 },
@@ -25,7 +28,12 @@ const MacroDataSection = () => {
                 console.log("API Response:", response.data);
 
                 const log = response.data[0] || {};
-                const totalNutrition = log.dailyTotal || { calories: 0, fat: 0, protein: 0, carbohydratess: 0 };
+                const totalNutrition = log.dailyTotal || {
+                    calories: 0,
+                    fat: 0,
+                    protein: 0,
+                    carbohydrates: 0,
+                };
 
                 setMacros({
                     calories: { label: "Kcal", current: totalNutrition.calories || 0, max: 2000 },
@@ -40,8 +48,8 @@ const MacroDataSection = () => {
     };
 
     useEffect(() => {
-        fetchLogsAndCalculateMacros();
-    }, []);
+        fetchLogsAndCalculateMacros(); // Fetch macros whenever refreshKey changes
+    }, [refreshKey]); // Add refreshKey as a dependency
 
     const doughnutData = {
         labels: ["Current Calories", "Remaining"],
@@ -83,15 +91,35 @@ const MacroDataSection = () => {
                 {/* Macro Progress Bars */}
                 <div className="w-full max-w-sm pl-4 pr-2">
                     {[
-                        { label: "Protein", color: "bg-green-500", current: macros.protein.current, max: macros.protein.max, scale: macros.protein.scale },
-                        { label: "Fat", color: "bg-yellow-500", current: macros.fat.current, max: macros.fat.max, scale: macros.fat.scale },
-                        { label: "Carbs", color: "bg-blue-500", current: macros.carbohydrates.current, max: macros.carbohydrates.max, scale: macros.carbohydrates.scale },
+                        {
+                            label: "Protein",
+                            color: "bg-green-500",
+                            current: macros.protein.current,
+                            max: macros.protein.max,
+                            scale: macros.protein.scale,
+                        },
+                        {
+                            label: "Fat",
+                            color: "bg-yellow-500",
+                            current: macros.fat.current,
+                            max: macros.fat.max,
+                            scale: macros.fat.scale,
+                        },
+                        {
+                            label: "Carbs",
+                            color: "bg-blue-500",
+                            current: macros.carbohydrates.current,
+                            max: macros.carbohydrates.max,
+                            scale: macros.carbohydrates.scale,
+                        },
                     ].map((macro) => (
                         <div key={macro.label} className="mb-1">
                             <div className="flex justify-between mb-1">
                                 <span className="text-white text-sm">{macro.label}</span>
                                 <span className="text-gray-300 text-sm">
-                                    {macro.current}{macro.scale} / {macro.max}{macro.scale}
+                                    {macro.current}
+                                    {macro.scale} / {macro.max}
+                                    {macro.scale}
                                 </span>
                             </div>
                             <div className="w-full bg-gray-500 h-3 rounded-sm overflow-hidden">

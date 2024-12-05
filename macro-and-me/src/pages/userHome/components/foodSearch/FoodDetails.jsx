@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import api from '../../../../utils/api';
+import { useRefresh } from '../../context/RefreshContext';
 
 export default function FoodDetails({ foodId, handleBackToSearch, user }) {
+    const { triggerRefresh } = useRefresh();
     const [foodDetails, setFoodDetails] = useState(null);
     const [meal, setMeal] = useState({
         name: '',
@@ -95,6 +97,7 @@ export default function FoodDetails({ foodId, handleBackToSearch, user }) {
                     setMeal({ name: '', calories: '', fat: '', carbohydrates: '', protein: '' });
                     
                     handleBackToSearch(); 
+                    triggerRefresh();
                 } else {
                     const errorData = await response.json();
                     alert('Error logging meal: ' + errorData.message);
