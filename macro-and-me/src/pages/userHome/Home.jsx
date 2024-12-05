@@ -1,4 +1,4 @@
-import Header from "./components/Header";
+import Header from "./components/MacroDataSection";
 import MealSection from "./components/MealSection";
 import NavBar from "./components/NavBar";
 import { useNavigate } from "react-router-dom";

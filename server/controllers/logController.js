@@ -13,11 +13,18 @@ const processMeal = async (mealName, mealId) => {
             totals.calories += food.calories || 0;
             totals.fat += food.fat || 0;
             totals.protein += food.protein || 0;
-            totals.carbs += food.carbs || 0;
+            totals.carbohydrates += food.carbohydrates || 0;
             return totals;
         },
-        { calories: 0, fat: 0, protein: 0, carbs: 0 }
+        { calories: 0, fat: 0, protein: 0, carbohydrates: 0 }
     );
+    
+    totalNutrition.calories = Math.round(totalNutrition.calories);
+    totalNutrition.fat = Math.round(totalNutrition.fat * 100) / 100;
+    totalNutrition.protein = Math.round(totalNutrition.protein * 100) / 100;
+    totalNutrition.carbohydrates = Math.round(totalNutrition.carbohydrates * 100) / 100;
+    
+    
 
     return {
         [mealName]: {
@@ -45,10 +52,10 @@ const calculateDailyTotal = (dayMeals) => {
             totals.calories += meal.totalNutrition.calories;
             totals.fat += meal.totalNutrition.fat;
             totals.protein += meal.totalNutrition.protein;
-            totals.carbs += meal.totalNutrition.carbs;
+            totals.carbohydrates += meal.totalNutrition.carbohydrates;
             return totals;
         },
-        { calories: 0, fat: 0, protein: 0, carbs: 0 }
+        { calories: 0, fat: 0, protein: 0, carbohydrates: 0 }
     );
 };
 

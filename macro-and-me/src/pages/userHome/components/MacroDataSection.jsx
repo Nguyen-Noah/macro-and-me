@@ -1,12 +1,8 @@
-"use client";
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Doughnut } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
-import { color } from "framer-motion";
 import api from "../../../utils/api";
 import { useAuth } from "../../../AuthContext";
-
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -15,53 +11,37 @@ const MacroDataSection = () => {
     const firebaseUid = user.uid;
 
     const [macros, setMacros] = useState({
-        calories: {
-            label: 'Kcal',
-            current: 400,
-            max: 1700
-        },
-        protein: {
-            label: 'Proteins',
-            current: 40,
-            max: 170,
-            scale: 'g'
-        },
-        fat: {
-            label: 'Fats',
-            current: 20,
-            max: 50,
-            scale: 'g'
-        },
-        carb: {
-            label: 'Carbs',
-            current: 50,
-            max: 100,
-            scale: 'g'
-        },
-        water: {
-            label: "Water",
-            current: 20,
-            max: 100,
-            scale: ' fl oz'
-        }
+        calories: { label: "Kcal", current: 0, max: 2000 },
+        protein: { label: "Proteins", current: 0, max: 150, scale: "g" },
+        fat: { label: "Fats", current: 0, max: 70, scale: "g" },
+        carbohydrates: { label: "Carbs", current: 0, max: 80, scale: "g" },
     });
 
-    const fetchLogs = async (e) => {
-        e.preventDefault();
+    const fetchLogsAndCalculateMacros = async () => {
         try {
-            if (user) {
-                const response = await api.get('daily_logs', { firebaseUid });
+            const response = await api.get("/daily_logs", { firebaseUid });
+
+            if (response.status === 200 && response.data) {
+                console.log("API Response:", response.data);
+
+                const log = response.data[0] || {};
+                const totalNutrition = log.dailyTotal || { calories: 0, fat: 0, protein: 0, carbohydratess: 0 };
+
+                setMacros({
+                    calories: { label: "Kcal", current: totalNutrition.calories || 0, max: 2000 },
+                    protein: { label: "Proteins", current: totalNutrition.protein || 0, max: 150, scale: "g" },
+                    fat: { label: "Fats", current: totalNutrition.fat || 0, max: 70, scale: "g" },
+                    carbohydrates: { label: "Carbs", current: totalNutrition.carbohydrates || 0, max: 80, scale: "g" },
+                });
             }
-            /*
-            
-            handle response data here
-
-            */
         } catch (error) {
-            console.log('Error fetching logs.');
+            console.error("Error fetching logs:", error);
         }
-    }
+    };
 
+    useEffect(() => {
+        fetchLogsAndCalculateMacros();
+    }, []);
 
     const doughnutData = {
         labels: ["Current Calories", "Remaining"],
@@ -69,7 +49,7 @@ const MacroDataSection = () => {
             {
                 label: "Calories",
                 data: [macros.calories.current, macros.calories.max - macros.calories.current],
-                backgroundColor: ["#10B981", "#E5E7EB"], // Green for current, light gray for remaining
+                backgroundColor: ["#10B981", "#E5E7EB"],
                 hoverOffset: 4,
             },
         ],
@@ -78,20 +58,15 @@ const MacroDataSection = () => {
     const doughnutOptions = {
         cutout: "75%",
         plugins: {
-            legend: {
-                display: false,
-            },
-            tooltip: {
-                enabled: false,
-            },
+            legend: { display: false },
+            tooltip: { enabled: false },
         },
     };
 
     return (
         <section className="px-6 py-4">
             <div className="bg-slate-700 px-3 py-6 rounded-xl shadow-md w-full flex items-center justify-between">
-
-                {/* Doughnut Chart with Centered Text */}
+                {/* Doughnut Chart */}
                 <div className="md:pl-10">
                     <div className="relative">
                         <div className="w-36 h-36 md:w-52 md:h-52">
@@ -105,13 +80,12 @@ const MacroDataSection = () => {
                     </div>
                 </div>
 
-                {/* Percentage Bars for Macros */}
+                {/* Macro Progress Bars */}
                 <div className="w-full max-w-sm pl-4 pr-2">
                     {[
                         { label: "Protein", color: "bg-green-500", current: macros.protein.current, max: macros.protein.max, scale: macros.protein.scale },
                         { label: "Fat", color: "bg-yellow-500", current: macros.fat.current, max: macros.fat.max, scale: macros.fat.scale },
-                        { label: "Carbs", color: "bg-blue-500", current: macros.carb.current, max: macros.carb.max, scale: macros.carb.scale },
-                        { label: "Water", color: "bg-blue-300", current: macros.water.current, max: macros.water.max, scale: macros.water.scale }
+                        { label: "Carbs", color: "bg-blue-500", current: macros.carbohydrates.current, max: macros.carbohydrates.max, scale: macros.carbohydrates.scale },
                     ].map((macro) => (
                         <div key={macro.label} className="mb-1">
                             <div className="flex justify-between mb-1">

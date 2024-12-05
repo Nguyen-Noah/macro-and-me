@@ -2,7 +2,7 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Home from '../pages/userHome/Home';
-import FoodSearch from '../pages/FoodSearch';
+import FoodSearch from '../pages/userHome/components/foodSearch/FoodSearch';
 import ImageUpload from '../pages/ImageUpload';
 import Login from '../pages/loginPage/Login';
 import About from '../pages/aboutPage/About';

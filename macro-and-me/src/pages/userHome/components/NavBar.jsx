@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import Modal from "./Modal";
-import FoodSearch from "../../FoodSearch";
+import FoodSearch from "./foodSearch/FoodSearch";
 import ImageUpload from "../../ImageUpload";
 import { ICON_GRAPH, ICON_HOME, ICON_PLUS, ICON_BOOK, ICON_USER, ICON_SEARCH, ICON_CAMERA } from "../../../utils/svg";
 

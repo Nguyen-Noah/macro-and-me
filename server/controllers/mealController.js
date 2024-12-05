@@ -10,6 +10,7 @@ export const createMeal = async (req, res) => {
     try {
         // check for the user
         const user = await User.findOne({ firebaseUid: firebaseUid });
+
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
