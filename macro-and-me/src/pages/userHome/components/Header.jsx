@@ -4,11 +4,16 @@ import { useState } from "react";
 import { Doughnut } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { color } from "framer-motion";
+import api from "../../../utils/api";
+import { useAuth } from "../../../AuthContext";
 
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const MacroDataSection = () => {
+    const user = useAuth().user;
+    const firebaseUid = user.uid;
+
     const [macros, setMacros] = useState({
         calories: {
             label: 'Kcal',
@@ -40,6 +45,22 @@ const MacroDataSection = () => {
             scale: ' fl oz'
         }
     });
+
+    const fetchLogs = async (e) => {
+        e.preventDefault();
+        try {
+            if (user) {
+                const response = await api.get('daily_logs', { firebaseUid });
+            }
+            /*
+            
+            handle response data here
+
+            */
+        } catch (error) {
+            console.log('Error fetching logs.');
+        }
+    }
 
 
     const doughnutData = {

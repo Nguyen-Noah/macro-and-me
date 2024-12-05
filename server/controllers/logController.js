@@ -1,6 +1,7 @@
 import Food from "../models/Food.js";
 import Log from "../models/Log.js";
 import Meal from "../models/Meal.js";
+import User from "../models/User.js";
 
 // fetching and processing foods for a single meal
 const processMeal = async (mealName, mealId) => {
@@ -94,8 +95,8 @@ const fetchFoodsForMeals = async (meals) => {
 
 export const getUserDailyLogs = async (req, res) => {
     try {
-        const userId = req.params.userId;
-        const dailyLogs = await getLogs(userId);
+        const mongoId = await User.findOne({ firebaseUid: req.query.firebaseUid });
+        const dailyLogs = await getLogs(mongoId);
 
         res.status(200).json(dailyLogs);
     } catch (error) {
