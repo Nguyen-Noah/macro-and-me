@@ -1,12 +1,13 @@
 import Log from "../models/Log.js";
 import Meal from "../models/Meal.js";
 
-export const findOrCreateMeal = async (mealType, newFoodId) => {
+export const findOrCreateMeal = async (userId, mealType, newFoodId) => {
     try {
         const date = new Date();
         date.setHours(0, 0, 0, 0);
 
         const query = {
+            userId: userId,
             [mealType]: { $ne: null },
             date: date
         }

@@ -21,11 +21,29 @@ const MealSection = () => {
         try {
             if (user) {
                 const response = await api.get("daily_logs", { firebaseUid });
-                console.log("Fetched logs data:", response.data);
-                setLogs(response.data || []);
-                setEditedLogs(
-                    response.data.length > 0 ? { ...response.data[0] } : {}
-                );
+                const logs = response.data;
+                console.log("Fetched logs data:", logs);
+                setLogs(logs || []);
+
+                if (logs.length !== 0) {
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+
+                    const lastLog = new Date(logs[0].date);
+                    lastLog.setHours(0, 0, 0, 0);
+
+                    if (today.getTime() !== lastLog.getTime()) {
+                        console.log('Logs found, but none today.');
+                        setEditedLogs({});
+                    } else {
+                        console.log('Log found today.');
+                        setEditedLogs(logs[0]);
+                    }
+                } else {
+                    console.log('No meals found.');
+                    setEditedLogs({});
+                }
+
             }
         } catch (error) {
             setError("Failed to fetch logs");

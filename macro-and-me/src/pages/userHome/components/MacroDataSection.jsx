@@ -27,7 +27,26 @@ const MacroDataSection = () => {
             if (response.status === 200 && response.data) {
                 console.log("API Response:", response.data);
 
-                const log = response.data[0] || {};
+                let log;
+                if (response.data.length !== 0) {
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+
+                    const lastLog = new Date(response.data[0].date);
+                    lastLog.setHours(0, 0, 0, 0);
+
+                    if (today.getTime() !== lastLog.getTime()) {
+                        console.log('CHART - Logs found, but none today.');
+                        log = {};
+                    } else {
+                        console.log('CHART - Log found today.');
+                        log = response.data[0];
+                    }
+                } else {
+                    console.log('CHART - No meals found.');
+                    log = {}
+                }
+                
                 const totalNutrition = log.dailyTotal || {
                     calories: 0,
                     fat: 0,
