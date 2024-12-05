@@ -20,9 +20,9 @@ const processMeal = async (mealName, mealId) => {
     );
     
     totalNutrition.calories = Math.round(totalNutrition.calories);
-    totalNutrition.fat = Math.round(totalNutrition.fat * 100) / 100;
-    totalNutrition.protein = Math.round(totalNutrition.protein * 100) / 100;
-    totalNutrition.carbohydrates = Math.round(totalNutrition.carbohydrates * 100) / 100;
+    totalNutrition.fat = Math.round(totalNutrition.fat);
+    totalNutrition.protein = Math.round(totalNutrition.protein); 
+    totalNutrition.carbohydrates = Math.round(totalNutrition.carbohydrates);
     
     
 

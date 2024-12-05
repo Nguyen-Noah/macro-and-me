@@ -93,6 +93,8 @@ export default function FoodDetails({ foodId, handleBackToSearch, user }) {
                 if (response.status === 201) {
                     alert('Meal logged successfully!');
                     setMeal({ name: '', calories: '', fat: '', carbohydrates: '', protein: '' });
+                    
+                    handleBackToSearch(); 
                 } else {
                     const errorData = await response.json();
                     alert('Error logging meal: ' + errorData.message);
@@ -105,6 +107,7 @@ export default function FoodDetails({ foodId, handleBackToSearch, user }) {
             alert('Error logging meal. Please try again.');
         }
     };
+    
 
     return (
         <div>
@@ -118,7 +121,6 @@ export default function FoodDetails({ foodId, handleBackToSearch, user }) {
                     <p>Fat: {foodDetails.nf_total_fat || 0} g</p>
                     <p>Carbs: {foodDetails.nf_total_carbohydrate || 0} g</p>
 
-                    {/* Editable Inputs */}
                     <div className="mt-4">
                         <label className="block mb-2">Meal Type:</label>
                         <select

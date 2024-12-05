@@ -13,7 +13,6 @@ const MealSection = () => {
     const user = useAuth().user;
     const firebaseUid = user.uid;
 
-
     const fetchLogs = async () => {
         try {
             if (user) {
@@ -44,22 +43,25 @@ const MealSection = () => {
     };
 
     const saveFoodChanges = async () => {
-        const updatedFood = {
-            calories: parseInt(selectedFood.calories),
-            fat: parseInt(selectedFood.fat),
-            protein: parseInt(selectedFood.protein),
-            carbohydrates: parseInt(selectedFood.carbohydrates)
-        };
-
-        console.log(updatedFood)
         try {
             if (user) {
+                const updatedFood = {
+                    calories: parseInt(selectedFood.calories),
+                    fat: parseInt(selectedFood.fat),
+                    protein: parseInt(selectedFood.protein),
+                    carbohydrates: parseInt(selectedFood.carbohydrates),
+                };
+
                 const foodId = selectedFood._id;
-                const response = await api.put('/food', { foodId, updatedFood });
-                console.log(response)
+                const response = await api.put("/food", { foodId, updatedFood });
+
+                console.log("Food changes saved successfully:", response.data);
+                // Close modal after saving
+                setShowModal(false);
             }
         } catch (error) {
-
+            console.error("Error saving food changes:", error);
+            setShowError(true); // Show error message if save fails
         }
     };
 
@@ -75,7 +77,10 @@ const MealSection = () => {
                     const mealData = editedLogs[mealKey];
 
                     return (
-                        <div key={index} className="bg-neutral-900 p-4 rounded-lg h-auto flex flex-col">
+                        <div
+                            key={index}
+                            className="bg-neutral-900 p-4 rounded-lg h-auto flex flex-col"
+                        >
                             <h3 className="text-lg font-bold mb-2">{meal}</h3>
                             {mealData && mealData.foods.length > 0 ? (
                                 mealData.foods.map((food, foodIndex) => (
@@ -90,12 +95,12 @@ const MealSection = () => {
                             ) : (
                                 <div>No data</div>
                             )}
-                            
                         </div>
                     );
                 })}
             </div>
 
+            {/* Food Modal */}
             {showModal && selectedFood && (
                 <FoodModal
                     food={selectedFood}
@@ -103,8 +108,8 @@ const MealSection = () => {
                     onSave={saveFoodChanges}
                     errorMessage={showError}
                     onCancel={() => {
-                        setShowModal(false) 
-                        setShowError(false)
+                        setShowModal(false);
+                        setShowError(false);
                     }}
                 />
             )}
