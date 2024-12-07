@@ -14,15 +14,19 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 2: Set up Google Cloud SDK
+      # Step 2: Authenticate with GCP
+      - name: Authenticate with GCP
+        uses: google-github-actions/auth@v1
+        with:
+          service_account_key: ${{ secretes.GCP_SA_KEY }}
+
+      # Step 3: Set up Google Cloud SDK
       - name: Set up Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v1
         with:
           project_id: macro-and-me
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
-          export_default_credentials: true
 
-      # Step 3: Create and deploy server app.yaml
+      # Step 4: Create and deploy server app.yaml
       - name: Create server app.yaml
         working-directory: ./server
         run: |
@@ -40,7 +44,7 @@ jobs:
         working-directory: ./server
         run: gcloud app deploy app.yaml --quiet
 
-      # Step 4: Create and deploy frontend app.yaml
+      # Step 5: Create and deploy frontend app.yaml
       - name: Create frontend app.yaml
         working-directory: ./macro-and-me
         run: |
