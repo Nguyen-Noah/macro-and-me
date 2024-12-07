@@ -7,7 +7,7 @@ import { useRefresh } from "../context/RefreshContext";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-const MacroDataSection = () => {
+const MacroDataSection = ({ selectedDate }) => {
     const user = useAuth().user;
     const firebaseUid = user.uid;
 
@@ -20,33 +20,33 @@ const MacroDataSection = () => {
         carbohydrates: { label: "Carbs", current: 0, max: 80, scale: "g" },
     });
 
-    const fetchLogsAndCalculateMacros = async () => {
+    const fetchLogsAndCalculateMacros = async (date) => {
         try {
-            const response = await api.get("/daily_logs", { firebaseUid });
+            const response = await api.get("/daily_logs", { firebaseUid, date });
 
             if (response.status === 200 && response.data) {
                 console.log("API Response:", response.data);
 
                 let log;
                 if (response.data.length !== 0) {
-                    const today = new Date();
-                    today.setHours(0, 0, 0, 0);
+                    const requestedDate = new Date(date);
+                    requestedDate.setUTCHours(0, 0, 0, 0);
 
                     const lastLog = new Date(response.data[0].date);
-                    lastLog.setHours(0, 0, 0, 0);
+                    lastLog.setUTCHours(0, 0, 0, 0);
 
-                    if (today.getTime() !== lastLog.getTime()) {
-                        console.log('CHART - Logs found, but none today.');
+                    if (requestedDate.getTime() !== lastLog.getTime()) {
+                        console.log("CHART - Logs found, but none for the selected date.");
                         log = {};
                     } else {
-                        console.log('CHART - Log found today.');
+                        console.log("CHART - Log found for the selected date.");
                         log = response.data[0];
                     }
                 } else {
-                    console.log('CHART - No meals found.');
-                    log = {}
+                    console.log("CHART - No meals found.");
+                    log = {};
                 }
-                
+
                 const totalNutrition = log.dailyTotal || {
                     calories: 0,
                     fat: 0,
@@ -67,8 +67,8 @@ const MacroDataSection = () => {
     };
 
     useEffect(() => {
-        fetchLogsAndCalculateMacros(); // Fetch macros whenever refreshKey changes
-    }, [refreshKey]); // Add refreshKey as a dependency
+        fetchLogsAndCalculateMacros(selectedDate); // Fetch macros based on the selected date
+    }, [refreshKey, selectedDate]); // Update when refreshKey or selectedDate changes
 
     const doughnutData = {
         labels: ["Current Calories", "Remaining"],
@@ -109,7 +109,7 @@ const MacroDataSection = () => {
 
                 {/* Macro Progress Bars */}
                 <div className="w-full max-w-sm pl-4 pr-2">
-                    {[
+                    {[ 
                         {
                             label: "Protein",
                             color: "bg-green-500",

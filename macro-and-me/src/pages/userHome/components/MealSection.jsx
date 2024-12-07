@@ -1,49 +1,48 @@
-import api from "../../../utils/api";
 import { useAuth } from "../../../AuthContext";
 import { useState, useEffect } from "react";
-import FoodModal from "./FoodModal"; 
+import FoodModal from "./FoodModal";
 import { useRefresh } from "../context/RefreshContext";
+import api from "../../../utils/api";
 
-
-const MealSection = () => {
+const MealSection = ({ selectedDate }) => {
     const { triggerRefresh, refreshKey } = useRefresh();
-    
+
     const [showError, setShowError] = useState(false);
     const [logs, setLogs] = useState([]);
     const [editedLogs, setEditedLogs] = useState({});
     const [error, setError] = useState(null);
     const [selectedFood, setSelectedFood] = useState(null); // State for selected food
     const [showModal, setShowModal] = useState(false); // State for modal visibility
+
     const user = useAuth().user;
     const firebaseUid = user.uid;
 
-    const fetchLogs = async () => {
+    const fetchLogs = async (date) => {
         try {
             if (user) {
-                const response = await api.get("daily_logs", { firebaseUid });
+                const response = await api.get("daily_logs", { firebaseUid, date });
                 const logs = response.data;
                 console.log("Fetched logs data:", logs);
                 setLogs(logs || []);
 
                 if (logs.length !== 0) {
-                    const today = new Date();
-                    today.setHours(0, 0, 0, 0);
+                    const requestedDate = new Date(date);
+                    requestedDate.setUTCHours(0, 0, 0, 0);
 
                     const lastLog = new Date(logs[0].date);
-                    lastLog.setHours(0, 0, 0, 0);
+                    lastLog.setUTCHours(0, 0, 0, 0);
 
-                    if (today.getTime() !== lastLog.getTime()) {
-                        console.log('Logs found, but none today.');
+                    if (requestedDate.getTime() !== lastLog.getTime()) {
+                        console.log("Logs found, but none for the selected date.");
                         setEditedLogs({});
                     } else {
-                        console.log('Log found today.');
+                        console.log("Log found for the selected date.");
                         setEditedLogs(logs[0]);
                     }
                 } else {
-                    console.log('No meals found.');
+                    console.log("No meals found.");
                     setEditedLogs({});
                 }
-
             }
         } catch (error) {
             setError("Failed to fetch logs");
@@ -89,8 +88,8 @@ const MealSection = () => {
     };
 
     useEffect(() => {
-        fetchLogs();
-    }, [refreshKey]);
+        fetchLogs(selectedDate);
+    }, [refreshKey, selectedDate]);
 
     return (
         <section className="px-6 py-2">

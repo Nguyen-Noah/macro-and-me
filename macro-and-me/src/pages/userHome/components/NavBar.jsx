@@ -5,7 +5,7 @@ import FoodSearch from "./foodSearch/FoodSearch";
 import ImageUpload from "../../ImageUpload";
 import { ICON_GRAPH, ICON_HOME, ICON_PLUS, ICON_BOOK, ICON_USER, ICON_SEARCH, ICON_CAMERA } from "../../../utils/svg";
 
-const NavBar = () => {
+const NavBar = ( {selectedDate} ) => {
     const [showAdditionalButtons, setShowAdditionalButtons] = useState(false);
     const [modalContent, setModalContent] = useState(null);
     const [isModalOpen, setModalOpen] = useState(false);
@@ -44,7 +44,7 @@ const NavBar = () => {
     const handleClick = (button) => {
         switch (button) {
             case "Food Search":
-                openModal(<FoodSearch  closePopup={closeModal}/>);
+                openModal(<FoodSearch  closePopup={closeModal} selectedDate={selectedDate}/>);
                 break;
             case "Image Search":
                 openModal(<ImageUpload />);

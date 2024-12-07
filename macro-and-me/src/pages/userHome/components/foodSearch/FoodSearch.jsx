@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '../../../../AuthContext';
 import FoodDetails from './FoodDetails';
 
-export default function FoodSearch({ closePopup }) {
+export default function FoodSearch({ closePopup, selectedDate }) {
     const [query, setQuery] = useState('');
     const [results, setResults] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -111,6 +111,7 @@ export default function FoodSearch({ closePopup }) {
                         foodId={selectedFood}
                         handleBackToSearch={handleBackToSearch}
                         user={user}
+                        selectedDate={selectedDate}
                     />
                 )}
             </div>
