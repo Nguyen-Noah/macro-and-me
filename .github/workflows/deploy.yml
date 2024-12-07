@@ -26,6 +26,12 @@ jobs:
         with:
           project_id: macro-and-me
 
+      - name: Install root dependencies
+        run: |
+          if [ -f package.json ]; then
+            npm install
+          fi
+
       # Step 4: Create and deploy server app.yaml
       - name: Create server app.yaml
         working-directory: ./server
