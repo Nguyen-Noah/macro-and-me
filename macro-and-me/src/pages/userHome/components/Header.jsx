@@ -3,13 +3,12 @@
 import { useState } from "react";
 import { Doughnut } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
-import { color } from "framer-motion";
 
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const MacroDataSection = () => {
-    const [macros, setMacros] = useState({
+    const macros = {
         calories: {
             label: 'Kcal',
             current: 400,
@@ -39,7 +38,7 @@ const MacroDataSection = () => {
             max: 100,
             scale: ' fl oz'
         }
-    });
+    };
 
 
     const doughnutData = {

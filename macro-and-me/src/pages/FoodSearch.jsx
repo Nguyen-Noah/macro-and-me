@@ -118,7 +118,7 @@ export default function FoodSearch({ closePopup }) {
                     { ...logData, mealType, firebaseUid },
                     { headers: { 'Content-Type': 'application/json' }}
                 );
-                if (response.status == 201) {
+                if (response.status === 201) {
                     alert('Meal logged successfully!');
                 } else {
                     const errorData = await response.json();
