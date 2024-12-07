@@ -1,8 +1,24 @@
 steps:
+  # Install dependencies and build the frontend
+  - name: 'node:20'
+    dir: 'macro-and-me'
+    entrypoint: 'npm'
+    args: ['install']
+  - name: 'node:16'
+    dir: 'macro-and-me'
+    entrypoint: 'npm'
+    args: ['run', 'build']
+  - name: 'gcr.io/cloud-builders/gsutil'
+    args: ['cp', '-r', 'macro-and-me/build/*', 'gs://macro-and-me-bucket']
+
+  # Install dependencies and deploy the backend
+  - name: 'node:20'
+    dir: 'server'
+    entrypoint: 'npm'
+    args: ['install']
   - name: 'gcr.io/cloud-builders/gcloud'
-    args: ['app', 'deploy', 'server/app.yaml', '--quiet']
-  - name: 'gcr/cloud-builders/gcloud'
-    args: ['app', 'deploy', 'macro-and-me/app.yaml', '--quiet']
+    dir: 'server'
+    args: ['app', 'deploy', '--quiet']
 
 options:
   logging: CLOUD_LOGGING_ONLY
