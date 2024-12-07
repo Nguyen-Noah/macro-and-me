@@ -3,3 +3,6 @@ steps:
     args: ['app', 'deploy', 'server/app.yaml', '--quiet']
   - name: 'gcr/cloud-builders/gcloud'
     args: ['app', 'deploy', 'macro-and-me/app.yaml', '--quiet']
+
+options:
+  logging: CLOUD_LOGGING_ONLY
