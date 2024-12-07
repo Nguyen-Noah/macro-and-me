@@ -19,7 +19,7 @@ jobs:
         uses: google-github-actions/setup-gcloud@v1
         with:
           project_id: macro-and-me
-          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
           export_default_credentials: true
 
       # Step 3: Create and deploy server app.yaml
