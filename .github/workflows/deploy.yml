@@ -1,0 +1,67 @@
+name: Deploy MERN App to GCP
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Google Cloud SDK
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: macro-and-me
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          export_default_credentials: true
+
+      # Step 3: Create and deploy server app.yaml
+      - name: Create server app.yaml
+        working-directory: ./server
+        run: |
+          echo "runtime: nodejs20" > app.yaml
+          echo "env: flex" >> app.yaml
+          echo "entrypoint: npm start" >> app.yaml
+          echo "automatic_scaling:" >> app.yaml
+          echo "  target_cpu_utilization: 0.65" >> app.yaml
+          echo "  max_instances: 5" >> app.yaml
+          echo "env_variables:" >> app.yaml
+          echo "  MONGO_URI: '${{ secrets.MONGO_URI }}'" >> app.yaml
+          echo "  OPENAI_API_KEY: '${{ secrets.OPENAI_API_KEY }}'" >> app.yaml
+
+      - name: Deploy server
+        working-directory: ./server
+        run: gcloud app deploy app.yaml --quiet
+
+      # Step 4: Create and deploy frontend app.yaml
+      - name: Create frontend app.yaml
+        working-directory: ./macro-and-me
+        run: |
+          echo "runtime: nodejs20" > app.yaml
+          echo "env: flex" >> app.yaml
+          echo "entrypoint: npm run start" >> app.yaml
+          echo "automatic_scaling:" >> app.yaml
+          echo "  target_cpu_utilization: 0.65" >> app.yaml
+          echo "  max_instances: 5" >> app.yaml
+          echo "env_variables:" >> app.yaml
+          echo "  REACT_APP_NUTRITIONIX_APP_ID: '${{ secrets.REACT_APP_NUTRITIONIX_APP_ID }}'" >> app.yaml
+          echo "  REACT_APP_NUTRITIONIX_APP_KEY: '${{ secrets.REACT_APP_NUTRITIONIX_APP_KEY }}'" >> app.yaml
+          echo "  REACT_APP_FIREBASE_API_KEY: '${{ secrets.REACT_APP_FIREBASE_API_KEY }}'" >> app.yaml
+          echo "  REACT_APP_FIREBASE_AUTH_DOMAIN: '${{ secrets.REACT_APP_FIREBASE_AUTH_DOMAIN }}'" >> app.yaml
+          echo "  REACT_APP_FIREBASE_PROJECT_ID: '${{ secrets.REACT_APP_FIREBASE_PROJECT_ID }}'" >> app.yaml
+          echo "  REACT_APP_FIREBASE_STORAGE_BUCKET: '${{ secrets.REACT_APP_FIREBASE_STORAGE_BUCKET }}'" >> app.yaml
+          echo "  REACT_APP_FIREBASE_MESSAGING_SENDER_ID: '${{ secrets.REACT_APP_FIREBASE_MESSAGING_SENDER_ID }}'" >> app.yaml
+          echo "  REACT_APP_FIREBASE_APP_ID: '${{ secrets.REACT_APP_FIREBASE_APP_ID }}'" >> app.yaml
+          echo "  REACT_APP_FIREBASE_MEASUREMENT_ID: '${{ secrets.REACT_APP_FIREBASE_MEASUREMENT_ID }}'" >> app.yaml
+          echo "  REACT_APP_USDA_API_KEY: '${{ secrets.REACT_APP_USDA_API_KEY }}'" >> app.yaml
+
+      - name: Deploy frontend
+        working-directory: ./macro-and-me
+        run: gcloud app deploy app.yaml --quiet
