@@ -54,3 +54,8 @@ class API {
 
 const api = new API('http://localhost:5000/api'); // <- put this in .env eventually
 export default api;
+
+export const fetchUser = async (firebaseUid) => {
+    const response = await api.get(`/fetchUser/${firebaseUid}`);
+    return response.data;
+};

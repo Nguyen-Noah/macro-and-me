@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '../../../../AuthContext';
 import FoodDetails from './FoodDetails';
 
-export default function FoodSearch({ closePopup, selectedDate }) {
+export default function FoodSearch({ closePopup, selectedDate, onSuccess}) {
     const [query, setQuery] = useState('');
     const [results, setResults] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -23,8 +23,8 @@ export default function FoodSearch({ closePopup, selectedDate }) {
         setResults([]);
 
         try {
-            const appId = process.env.REACT_APP_NUTRITIONIX_APP_ID2;
-            const appKey = process.env.REACT_APP_NUTRITIONIX_APP_KEY2;
+            const appId = process.env.REACT_APP_NUTRITIONIX_APP_ID3;
+            const appKey = process.env.REACT_APP_NUTRITIONIX_APP_KEY3;
 
             const response = await fetch(
                 `https://trackapi.nutritionix.com/v2/search/instant?query=${trimmedQuery}`,
@@ -113,6 +113,7 @@ export default function FoodSearch({ closePopup, selectedDate }) {
                         user={user}
                         selectedDate={selectedDate}
                         closePopup={closePopup}
+                        onSuccess={onSuccess}
                     />
                 )}
             </div>

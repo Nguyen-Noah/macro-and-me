@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react';
 import api from '../../../../utils/api';
 import { useRefresh } from '../../context/RefreshContext';
 
-export default function FoodDetails({ foodId, handleBackToSearch, user, selectedDate, closePopup }) {
+let _ = require("underscore");
+
+export default function FoodDetails({ foodId, handleBackToSearch, user, selectedDate, closePopup, onSuccess }) {
     const { triggerRefresh } = useRefresh();
     const [foodDetails, setFoodDetails] = useState(null);
     const [meal, setMeal] = useState({
@@ -14,22 +16,24 @@ export default function FoodDetails({ foodId, handleBackToSearch, user, selected
     });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    const [mealType, setMealType] = useState('breakfast'); // Default meal type
-    const [showSuccessModal, setShowSuccessModal] = useState(false); // State for success modal
+    const [mealType, setMealType] = useState('breakfast');
+
 
     useEffect(() => {
+
+        console.log(foodId)
         const fetchFoodDetails = async () => {
             try {
-                const appId = process.env.REACT_APP_NUTRITIONIX_APP_ID2;
-                const appKey = process.env.REACT_APP_NUTRITIONIX_APP_KEY2;
+                const appId = process.env.REACT_APP_NUTRITIONIX_APP_ID3;
+                const appKey = process.env.REACT_APP_NUTRITIONIX_APP_KEY3;
 
                 let response;
 
-                // Check if `foodId` is a barcode/UPC or a natural language query
-                if (/^\d+$/.test(foodId)) {
-                    // Barcode/UPC detected, use v2/search/item
+                // Check if `foodId` is a natural language query or an ID
+                if (foodId.startsWith('nix_item_id_') || foodId.match(/^[a-f0-9]{24}$/)) {
+                    // Branded food or specific item ID
                     response = await fetch(
-                        `https://trackapi.nutritionix.com/v2/search/item?upc=${foodId}`,
+                        `https://trackapi.nutritionix.com/v2/search/item?nix_item_id=${foodId}`,
                         {
                             headers: {
                                 'x-app-id': appId,
@@ -38,7 +42,7 @@ export default function FoodDetails({ foodId, handleBackToSearch, user, selected
                         }
                     );
                 } else {
-                    // Natural language query, use v2/natural/nutrients
+                    // Common food, treat `foodId` as a natural language query
                     response = await fetch(`https://trackapi.nutritionix.com/v2/natural/nutrients`, {
                         method: 'POST',
                         headers: {
@@ -47,7 +51,7 @@ export default function FoodDetails({ foodId, handleBackToSearch, user, selected
                             'x-app-key': appKey,
                         },
                         body: JSON.stringify({
-                            query: foodId, // Pass the natural language query
+                            "query": foodId, 
                         }),
                     });
                 }
@@ -57,11 +61,9 @@ export default function FoodDetails({ foodId, handleBackToSearch, user, selected
                 }
 
                 const data = await response.json();
-                console.log("API Response:", data);
+                console.log("API Response:", data); // Debugging log
 
-                const food = data.foods ? data.foods[0] : data.food; // Support both responses
-                if (!food) throw new Error('No food details found.');
-
+                const food = data.foods ? data.foods[0] : data.food;
                 setFoodDetails(food);
                 setMeal({
                     name: food.food_name || '',
@@ -81,6 +83,7 @@ export default function FoodDetails({ foodId, handleBackToSearch, user, selected
         fetchFoodDetails();
     }, [foodId]);
 
+
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setMeal((prev) => ({ ...prev, [name]: value }));
@@ -91,30 +94,22 @@ export default function FoodDetails({ foodId, handleBackToSearch, user, selected
         normalizeDate.setHours(0, 0, 0, 0);
 
         try {
-            if (user) {
-                const firebaseUid = user.uid;
-                const response = await api.post(
-                    '/log_meal',
-                    { ...meal, mealType, firebaseUid, date: normalizeDate },
-                    { headers: { 'Content-Type': 'application/json' } }
-                );
-                if (response.status === 201) {
-                    setMeal({ name: '', calories: '', fat: '', carbohydrates: '', protein: '' });
+            const response = await api.post('/log_meal', {
+                ...meal,
+                mealType,
+                firebaseUid: user.uid,
+                date: normalizeDate,
+            });
 
-                    setShowSuccessModal(true);
+            if (response.status === 201) {
+                setMeal({ name: '', calories: '', fat: '', carbohydrates: '', protein: '' });
+                closePopup();
+                onSuccess();
+                triggerRefresh();
 
-                    setTimeout(() => {
-                        setShowSuccessModal(false);
-                    }, 3000);
-
-                    closePopup();
-                    triggerRefresh();
-                } else {
-                    const errorData = await response.json();
-                    alert('Error logging meal: ' + errorData.message);
-                }
             } else {
-                alert('User not logged in');
+                const errorData = await response.json();
+                alert('Error logging meal: ' + errorData.message);
             }
         } catch (error) {
             console.error('Error:', error);
@@ -135,7 +130,7 @@ export default function FoodDetails({ foodId, handleBackToSearch, user, selected
                     <p className="text-black text-center">Carbs: {foodDetails.nf_total_carbohydrate || 0} g</p>
 
                     <div className="mt-4">
-                        <label className="block mb-2">Meal Type:</label>
+                        <label className="block mb-2 text-black">Meal Type:</label>
                         <select
                             value={mealType}
                             onChange={(e) => setMealType(e.target.value)}
@@ -147,7 +142,7 @@ export default function FoodDetails({ foodId, handleBackToSearch, user, selected
                             <option value="snacks">Snacks</option>
                         </select>
 
-                        <label className="block mt-4">Calories:</label>
+                        <label className="block mt-4 text-black">Calories:</label>
                         <input
                             type="number"
                             name="calories"
@@ -156,7 +151,7 @@ export default function FoodDetails({ foodId, handleBackToSearch, user, selected
                             className="p-2 border rounded-md w-full text-black"
                         />
 
-                        <label className="block mt-4">Protein (g):</label>
+                        <label className="block mt-4 text-black">Protein (g):</label>
                         <input
                             type="number"
                             name="protein"
@@ -165,7 +160,7 @@ export default function FoodDetails({ foodId, handleBackToSearch, user, selected
                             className="p-2 border rounded-md w-full text-black"
                         />
 
-                        <label className="block mt-4">Fat (g):</label>
+                        <label className="block mt-4 text-black">Fat (g):</label>
                         <input
                             type="number"
                             name="fat"
@@ -174,7 +169,7 @@ export default function FoodDetails({ foodId, handleBackToSearch, user, selected
                             className="p-2 border rounded-md w-full text-black"
                         />
 
-                        <label className="block mt-4">Carbohydrates (g):</label>
+                        <label className="block mt-4 text-black">Carbohydrates (g):</label>
                         <input
                             type="number"
                             name="carbohydrates"
@@ -197,12 +192,6 @@ export default function FoodDetails({ foodId, handleBackToSearch, user, selected
                             Log Meal
                         </button>
                     </div>
-                </div>
-            )}
-
-            {showSuccessModal && (
-                <div className="fixed bottom-16 left-1/2 transform -translate-x-1/2 bg-green-500 text-white p-6 rounded-lg shadow-xl border-4 border-green-600">
-                    <p className="font-semibold">Successfully added food!</p>
                 </div>
             )}
         </div>

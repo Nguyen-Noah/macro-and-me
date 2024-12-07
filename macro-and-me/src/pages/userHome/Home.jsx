@@ -1,7 +1,7 @@
 import MealSection from "./components/MealSection";
 import NavBar from "./components/NavBar";
-import { useNavigate } from "react-router-dom";
-import { auth } from "../../firebaseConfig";
+// import { useNavigate } from "react-router-dom";
+// import { auth } from "../../firebaseConfig";
 import { useRefresh } from "./context/RefreshContext";
 import MacroDataSection from "./components/MacroDataSection";
 import { useState } from "react";
@@ -13,12 +13,12 @@ export default function Home() {
     
 
     const { refreshKey, triggerRefresh } = useRefresh();
-    const navigate = useNavigate();
     const [selectedDate, setSelectedDate] = useState(() => {
         const date = new Date();
         date.setDate(date.getDate() + 1);
         return date.toISOString().split("T")[0];
     });
+
 
 
     // const handleLogout = () => {

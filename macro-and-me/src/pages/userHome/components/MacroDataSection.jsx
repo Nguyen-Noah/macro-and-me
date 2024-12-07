@@ -7,7 +7,8 @@ import { useRefresh } from "../context/RefreshContext";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-const MacroDataSection = ({ selectedDate }) => {
+const MacroDataSection = ({ selectedDate}) => {
+
     const user = useAuth().user;
     const firebaseUid = user.uid;
 
@@ -20,68 +21,84 @@ const MacroDataSection = ({ selectedDate }) => {
         carbohydrates: { label: "Carbs", current: 0, max: 80, scale: "g" },
     });
 
+    const fetchProfileData = async () => {
+        try {
+            const response = await api.get(`/getUserProfile?firebaseUid=${firebaseUid}`);
+            if (response.status === 200 && response.data) {
+                const { maxCal = 2000, maxProtein = 150, maxCarb = 80, maxFat = 70 } = response.data || {};
+                console.log(response.data);
+                setMacros((prevMacros) => ({
+                    ...prevMacros,
+                    calories: { ...prevMacros.calories, max: maxCal },
+                    protein: { ...prevMacros.protein, max: maxProtein },
+                    fat: { ...prevMacros.fat, max: maxFat },
+                    carbohydrates: { ...prevMacros.carbohydrates, max: maxCarb },
+                }));
+            } else {
+                console.warn("No profile data found, using default values.");
+            }
+        } catch (error) {
+            console.error("Error fetching user profile data:", error);
+        }
+    };
+
+    const fetchLogsAndCalculateMacros = async (date) => {
+        try {
+            const requestedDate = new Date(date);
+            requestedDate.setHours(0, 0, 0, 0); // Normalize date to midnight
+            
+            const response = await api.get("/daily_logs", { firebaseUid });
+
+            if (response.status === 200 && response.data) {
+                let log = {};
+
+                // Find the log matching the selected date
+                response.data.forEach((logData) => {
+                    const logDate = new Date(logData.date);
+                    logDate.setHours(0, 0, 0, 0);
+
+                    if (logDate.getTime() === requestedDate.getTime()) {
+                        log = logData;
+                    }
+                });
+
+                if (!log || Object.keys(log).length === 0) {
+                    console.warn("No logs found for the selected date. Using default values.");
+                }
+
+                const totalNutrition = log.dailyTotal || {
+                    calories: 0,
+                    fat: 0,
+                    protein: 0,
+                    carbohydrates: 0,
+                };
+
+                setMacros((prevMacros) => ({
+                    ...prevMacros,
+                    calories: { ...prevMacros.calories, current: totalNutrition.calories || 0 },
+                    protein: { ...prevMacros.protein, current: totalNutrition.protein || 0 },
+                    fat: { ...prevMacros.fat, current: totalNutrition.fat || 0 },
+                    carbohydrates: { ...prevMacros.carbohydrates, current: totalNutrition.carbohydrates || 0 },
+                }));
+            } else {
+                console.warn("No log data found for the selected date. Using default values.");
+            }
+        } catch (error) {
+            console.error("Error fetching logs:", error);
+        }
+    };
 
     useEffect(() => {
-        const fetchLogsAndCalculateMacros = async (date) => {
-            try {
-    
-                const requestedDate = new Date(date);
-                requestedDate.setHours(0, 0, 0, 0); 
-    
-                console.log("Requested Date:", requestedDate.toISOString()); 
-    
-                const response = await api.get("/daily_logs", { firebaseUid });
-    
-                if (response.status === 200 && response.data) {
-                    console.log("API Response:", response.data);
-    
-                    let log = {}; 
-    
-                    response.data.forEach((logData) => {
-                        const logDate = new Date(logData.date); 
-                        logDate.setHours(0, 0, 0, 0); 
-    
-                        console.log("Log Date:", logDate.toISOString()); 
-    
-                        if (logDate.getTime() === requestedDate.getTime()) {
-                            log = logData; 
-                        }
-                    });
-    
-                    if (Object.keys(log).length === 0) {
-                        console.log("CHART - No logs found for the selected date.");
-                    } else {
-                        console.log("CHART - Log found for the selected date.");
-                    }
-    
-                    const totalNutrition = log.dailyTotal || {
-                        calories: 0,
-                        fat: 0,
-                        protein: 0,
-                        carbohydrates: 0,
-                    };
-    
-                    setMacros({
-                        calories: { label: "Kcal", current: totalNutrition.calories || 0, max: 2000 },
-                        protein: { label: "Proteins", current: totalNutrition.protein || 0, max: 150, scale: "g" },
-                        fat: { label: "Fats", current: totalNutrition.fat || 0, max: 70, scale: "g" },
-                        carbohydrates: { label: "Carbs", current: totalNutrition.carbohydrates || 0, max: 80, scale: "g" },
-                    });
-                }
-            } catch (error) {
-                console.error("Error fetching logs:", error);
-            }
-        };
-
-        fetchLogsAndCalculateMacros(selectedDate)
-    }, [refreshKey, selectedDate, firebaseUid]); 
+        fetchProfileData();
+        fetchLogsAndCalculateMacros(selectedDate);
+    }, [refreshKey, selectedDate, firebaseUid]);
 
     const doughnutData = {
         labels: ["Current Calories", "Remaining"],
         datasets: [
             {
                 label: "Calories",
-                data: [macros.calories.current, macros.calories.max - macros.calories.current],
+                data: [macros.calories.current, Math.max(0, macros.calories.max - macros.calories.current)],
                 backgroundColor: ["#10B981", "#E5E7EB"],
                 hoverOffset: 4,
             },
@@ -98,7 +115,6 @@ const MacroDataSection = ({ selectedDate }) => {
 
     return (
         <section className="px-6 pb-4">
-            
             <div className="bg-slate-700 rounded-b-2xl px-3 pb-6 pt-2 shadow-md w-full flex items-center justify-between md:px-28">
                 {/* Doughnut Chart */}
                 <div className="md:pl-10">
