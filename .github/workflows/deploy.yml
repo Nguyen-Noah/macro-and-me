@@ -44,4 +44,4 @@ jobs:
         run: |
           cd server
           npm ci
-          gclou app deploy --quiet
+          gcloud app deploy --quiet
