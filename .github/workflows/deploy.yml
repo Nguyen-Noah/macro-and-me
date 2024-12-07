@@ -30,18 +30,29 @@ jobs:
       - name: Install and build frontend
         run: |
           cd macro-and-me
-          pwd
           npm ci
           npm run build
 
+      - name: Generate app.yaml
+        run: |
+          echo "runtime: nodejs" > server/app.yaml
+          echo "runtime_config:" >> server/app.yaml
+          echo "  operating_system: 'ubuntu22'" >> server/app.yaml
+          echo "  runtime_version: '20'" >> server/app.yaml
+          echo "env: flex" >> server/app.yaml
+          echo "entrypoint: npm start" >> server/app.yaml
+          echo "env_variables:" >> server/app.yaml
+          echo "  MONGO_URI: '${{ secrets.MONGO_URI }}'" >> server/app.yaml
+          echo "  OPENAI_API_KEY: '${{ secrets.OPENAI_API_KEY }}'" >> server/app.yaml
+
       - name: Copy frontend build to server
         run: |
-          pwd
           cp -r macro-and-me/build server/public
 
       # Step 5: Deploy to App Engine
       - name: Deploy to App Engine
         run: |
           cd server
+          ls
           npm ci
           gcloud app deploy --quiet
