@@ -26,52 +26,20 @@ jobs:
         with:
           project_id: macro-and-me
 
-      - name: Install root dependencies
+      # Step 4: Install dependencies and build frontend
+      - name: Install and build frontend
         run: |
-          if [ -f package.json ]; then
-            npm install
-          fi
+          cd macro-and-me
+          npm ci
+          npm run build
 
-      # Step 4: Create and deploy server app.yaml
-      - name: Create server app.yaml
-        working-directory: ./server
+      - name: Copy frontend build to server
         run: |
-          echo "runtime: nodejs" >> app.yaml
-          echo "runtime_config:" >> app.yaml
-          echo "  operating_system: 'ubuntu22'" >> app.yaml
-          echo "  runtime_version: '20'" >> app.yaml
-          echo "env: flex" >> app.yaml
-          echo "entrypoint: npm start" >> app.yaml
-          echo "env_variables:" >> app.yaml
-          echo "  MONGO_URI: '${{ secrets.MONGO_URI }}'" >> app.yaml
-          echo "  OPENAI_API_KEY: '${{ secrets.OPENAI_API_KEY }}'" >> app.yaml
+          cp -r macro-and-me/build server/public
 
-      - name: Deploy server
-        working-directory: ./server
-        run: gcloud app deploy app.yaml --quiet
-
-      # Step 5: Create and deploy frontend app.yaml
-      - name: Create frontend app.yaml
-        working-directory: ./macro-and-me
+      # Step 5: Deploy to App Engine
+      - name: Deploy to App Engine
         run: |
-          echo "runtime: nodejs" >> app.yaml
-          echo "runtime_config:" >> app.yaml
-          echo "  operating_system: 'ubuntu22'" >> app.yaml
-          echo "  runtime_version: '20'" >> app.yaml
-          echo "env: flex" >> app.yaml
-          echo "entrypoint: npm run start" >> app.yaml
-          echo "env_variables:" >> app.yaml
-          echo "  REACT_APP_NUTRITIONIX_APP_ID: '${{ secrets.REACT_APP_NUTRITIONIX_APP_ID }}'" >> app.yaml
-          echo "  REACT_APP_NUTRITIONIX_APP_KEY: '${{ secrets.REACT_APP_NUTRITIONIX_APP_KEY }}'" >> app.yaml
-          echo "  REACT_APP_FIREBASE_API_KEY: '${{ secrets.REACT_APP_FIREBASE_API_KEY }}'" >> app.yaml
-          echo "  REACT_APP_FIREBASE_AUTH_DOMAIN: '${{ secrets.REACT_APP_FIREBASE_AUTH_DOMAIN }}'" >> app.yaml
-          echo "  REACT_APP_FIREBASE_PROJECT_ID: '${{ secrets.REACT_APP_FIREBASE_PROJECT_ID }}'" >> app.yaml
-          echo "  REACT_APP_FIREBASE_STORAGE_BUCKET: '${{ secrets.REACT_APP_FIREBASE_STORAGE_BUCKET }}'" >> app.yaml
-          echo "  REACT_APP_FIREBASE_MESSAGING_SENDER_ID: '${{ secrets.REACT_APP_FIREBASE_MESSAGING_SENDER_ID }}'" >> app.yaml
-          echo "  REACT_APP_FIREBASE_APP_ID: '${{ secrets.REACT_APP_FIREBASE_APP_ID }}'" >> app.yaml
-          echo "  REACT_APP_FIREBASE_MEASUREMENT_ID: '${{ secrets.REACT_APP_FIREBASE_MEASUREMENT_ID }}'" >> app.yaml
-          echo "  REACT_APP_USDA_API_KEY: '${{ secrets.REACT_APP_USDA_API_KEY }}'" >> app.yaml
-
-      - name: Deploy frontend
-        working-directory: ./macro-and-me
-        run: gcloud app deploy app.yaml --quiet
+          cd server
+          npm ci
+          gclou app deploy --quiet
