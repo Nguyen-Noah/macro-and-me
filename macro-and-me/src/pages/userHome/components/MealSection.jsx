@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import FoodModal from "./FoodModal";
 import { useRefresh } from "../context/RefreshContext";
 import api from "../../../utils/api";
+import { ICON_D_ARROW, ICON_U_ARROW, ICON_TRASH } from "../../../utils/svg";
 
 const MealSection = ({ selectedDate }) => {
     const { triggerRefresh, refreshKey } = useRefresh();
@@ -10,42 +11,49 @@ const MealSection = ({ selectedDate }) => {
     const [showError, setShowError] = useState(false);
     const [logs, setLogs] = useState([]);
     const [editedLogs, setEditedLogs] = useState({});
-    const [error, setError] = useState(null);
     const [selectedFood, setSelectedFood] = useState(null); // State for selected food
     const [showModal, setShowModal] = useState(false); // State for modal visibility
+    const [visibleMeals, setVisibleMeals] = useState({
+        breakfast: false,
+        lunch: false,
+        dinner: false,
+        snacks: false,
+    });
 
     const user = useAuth().user;
     const firebaseUid = user.uid;
 
     const fetchLogs = async (date) => {
         try {
-            if (user) {
-                const response = await api.get("daily_logs", { firebaseUid, date });
-                const logs = response.data;
-                console.log("Fetched logs data:", logs);
-                setLogs(logs || []);
+            const response = await api.get("daily_logs", { firebaseUid });
+            const logs = response.data;
+            setLogs(logs || []);
 
-                if (logs.length !== 0) {
-                    const requestedDate = new Date(date);
-                    requestedDate.setUTCHours(0, 0, 0, 0);
+            if (logs.length !== 0) {
+                const requestedDate = new Date(date);
+                requestedDate.setHours(0, 0, 0, 0);
 
-                    const lastLog = new Date(logs[0].date);
-                    lastLog.setUTCHours(0, 0, 0, 0);
+                let foundLog = null;
 
-                    if (requestedDate.getTime() !== lastLog.getTime()) {
-                        console.log("Logs found, but none for the selected date.");
-                        setEditedLogs({});
-                    } else {
-                        console.log("Log found for the selected date.");
-                        setEditedLogs(logs[0]);
+                logs.forEach((logData) => {
+                    const logDate = new Date(logData.date);
+                    logDate.setHours(0, 0, 0, 0);
+
+                    if (logDate.getTime() === requestedDate.getTime()) {
+                        foundLog = logData;
                     }
+                });
+
+                if (foundLog) {
+                    setEditedLogs(foundLog);
                 } else {
-                    console.log("No meals found.");
                     setEditedLogs({});
                 }
+            } else {
+                setEditedLogs({});
             }
         } catch (error) {
-            setError("Failed to fetch logs");
+            setShowError(true);
             console.error("Error fetching logs:", error);
         }
     };
@@ -77,15 +85,49 @@ const MealSection = ({ selectedDate }) => {
                 const response = await api.put("/food", { foodId, updatedFood });
 
                 console.log("Food changes saved successfully:", response.data);
-                // Close modal after saving
                 setShowModal(false);
                 triggerRefresh();
             }
         } catch (error) {
+            setShowError(true);
             console.error("Error saving food changes:", error);
-            setShowError(true); // Show error message if save fails
         }
     };
+
+    const toggleMealVisibility = (mealType) => {
+        setVisibleMeals((prevState) => ({
+            ...prevState,
+            [mealType]: !prevState[mealType],
+        }));
+    };
+
+    // Handle delete food
+    const handleDeleteFood = async (mealKey, foodIndex) => {
+        const foodId = editedLogs[mealKey]?.foods[foodIndex]._id;
+    
+        console.log("firebaseUid:", firebaseUid);
+        console.log("mealType:", mealKey);
+        console.log("foodId:", foodId);
+        console.log("selectedDate:", selectedDate); // Pass the selectedDate to the backend
+    
+        try {
+            const response = await api.delete('/remove_food', {
+                data: {
+                    firebaseUid,
+                    mealType: mealKey,
+                    foodId,
+                    date: selectedDate, // Include selectedDate to ensure the correct log is targeted
+                },
+            });
+    
+            console.log("Food deleted successfully:", response.data);
+            triggerRefresh(); // Refresh the data after deletion
+        } catch (error) {
+            setShowError(true); // Set error on delete failure
+            console.error("Error deleting food:", error);
+        }
+    };
+    
 
     useEffect(() => {
         fetchLogs(selectedDate);
@@ -93,30 +135,49 @@ const MealSection = ({ selectedDate }) => {
 
     return (
         <section className="px-6 py-2">
-            <div className="w-full mt-8 space-y-4">
-                {["Breakfast", "Lunch", "Dinner", "Snacks"].map((meal, index) => {
-                    const mealKey = meal.toLowerCase();
-                    const mealData = editedLogs[mealKey];
+            <div className="w-full space-y-4">
+                {["breakfast", "lunch", "dinner", "snacks"].map((meal, index) => {
+                    const mealData = editedLogs[meal];
 
                     return (
-                        <div
-                            key={index}
-                            className="bg-neutral-900 p-4 rounded-lg h-auto flex flex-col"
-                        >
-                            <h3 className="text-lg font-bold mb-2">{meal}</h3>
-                            {mealData && mealData.foods.length > 0 ? (
+                        <div key={index} className="bg-neutral-900 px-4 pt-2 pb-4 rounded-lg">
+                            <button
+                                onClick={() => toggleMealVisibility(meal)}
+                                className="flex justify-between items-center w-full p-2 text-white bg-transparent rounded-lg"
+                            >
+                                <h3 className="text-lg font-bold mb-2">
+                                    {meal.charAt(0).toUpperCase() + meal.slice(1)}
+                                </h3>
+                                <span className="text-xl">
+                                    {visibleMeals[meal] ? ICON_U_ARROW : ICON_D_ARROW}
+                                </span>
+                            </button>
+
+                            {/* Conditionally render the meal foods */}
+                            {visibleMeals[meal] && mealData && mealData.foods.length > 0 ? (
                                 mealData.foods.map((food, foodIndex) => (
                                     <div
                                         key={foodIndex}
-                                        className="flex items-center justify-between mb-2 cursor-pointer"
-                                        onClick={() => handleFoodClick(mealKey, foodIndex)}
+                                        className="flex items-center justify-between pl-5 cursor-pointer bg-neutral-800 rounded-lg px-2 py-2 mt-0 my-3"
+                                        onClick={() => handleFoodClick(meal, foodIndex)}
                                     >
                                         <span>{food.name}</span>
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation(); // Prevent triggering the food click
+                                                handleDeleteFood(meal, foodIndex);
+                                            }}
+                                            className="text-red-500"
+                                        >
+                                            {ICON_TRASH}
+                                        </button>
                                     </div>
                                 ))
-                            ) : (
-                                <div>No data</div>
-                            )}
+                            ) : visibleMeals[meal] ? (
+                                <div className="flex items-center justify-between pl-5 cursor-pointer bg-neutral-800 rounded-lg px-2 py-2 mt-0 my-3">
+                                    No data
+                                </div>
+                            ) : null}
                         </div>
                     );
                 })}
@@ -140,3 +201,5 @@ const MealSection = ({ selectedDate }) => {
 };
 
 export default MealSection;
+
+

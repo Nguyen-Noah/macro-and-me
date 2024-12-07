@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import api from '../../../../utils/api';
 import { useRefresh } from '../../context/RefreshContext';
 
-export default function FoodDetails({ foodId, handleBackToSearch, user }) {
+export default function FoodDetails({ foodId, handleBackToSearch, user, selectedDate, closePopup }) {
     const { triggerRefresh } = useRefresh();
     const [foodDetails, setFoodDetails] = useState(null);
     const [meal, setMeal] = useState({
@@ -15,20 +15,21 @@ export default function FoodDetails({ foodId, handleBackToSearch, user }) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [mealType, setMealType] = useState('breakfast'); // Default meal type
+    const [showSuccessModal, setShowSuccessModal] = useState(false); // State for success modal
 
     useEffect(() => {
         const fetchFoodDetails = async () => {
             try {
-                const appId = process.env.REACT_APP_NUTRITIONIX_APP_ID;
-                const appKey = process.env.REACT_APP_NUTRITIONIX_APP_KEY;
+                const appId = process.env.REACT_APP_NUTRITIONIX_APP_ID2;
+                const appKey = process.env.REACT_APP_NUTRITIONIX_APP_KEY2;
 
                 let response;
 
-                // Check if `foodId` is a natural language query or an ID
-                if (foodId.startsWith('nix_item_id_') || foodId.match(/^[a-f0-9]{24}$/)) {
-                    // Branded food or specific item ID
+                // Check if `foodId` is a barcode/UPC or a natural language query
+                if (/^\d+$/.test(foodId)) {
+                    // Barcode/UPC detected, use v2/search/item
                     response = await fetch(
-                        `https://trackapi.nutritionix.com/v2/search/item?nix_item_id=${foodId}`,
+                        `https://trackapi.nutritionix.com/v2/search/item?upc=${foodId}`,
                         {
                             headers: {
                                 'x-app-id': appId,
@@ -37,7 +38,7 @@ export default function FoodDetails({ foodId, handleBackToSearch, user }) {
                         }
                     );
                 } else {
-                    // Common food, treat `foodId` as a natural language query
+                    // Natural language query, use v2/natural/nutrients
                     response = await fetch(`https://trackapi.nutritionix.com/v2/natural/nutrients`, {
                         method: 'POST',
                         headers: {
@@ -56,9 +57,11 @@ export default function FoodDetails({ foodId, handleBackToSearch, user }) {
                 }
 
                 const data = await response.json();
-                console.log("API Response:", data); // Debugging log
+                console.log("API Response:", data);
 
-                const food = data.foods ? data.foods[0] : data.food;
+                const food = data.foods ? data.foods[0] : data.food; // Support both responses
+                if (!food) throw new Error('No food details found.');
+
                 setFoodDetails(food);
                 setMeal({
                     name: food.food_name || '',
@@ -84,19 +87,27 @@ export default function FoodDetails({ foodId, handleBackToSearch, user }) {
     };
 
     const handleMealLog = async () => {
+        const normalizeDate = new Date(selectedDate);
+        normalizeDate.setHours(0, 0, 0, 0);
+
         try {
             if (user) {
                 const firebaseUid = user.uid;
                 const response = await api.post(
                     '/log_meal',
-                    { ...meal, mealType, firebaseUid },
+                    { ...meal, mealType, firebaseUid, date: normalizeDate },
                     { headers: { 'Content-Type': 'application/json' } }
                 );
                 if (response.status === 201) {
-                    alert('Meal logged successfully!');
                     setMeal({ name: '', calories: '', fat: '', carbohydrates: '', protein: '' });
-                    
-                    handleBackToSearch(); 
+
+                    setShowSuccessModal(true);
+
+                    setTimeout(() => {
+                        setShowSuccessModal(false);
+                    }, 3000);
+
+                    closePopup();
                     triggerRefresh();
                 } else {
                     const errorData = await response.json();
@@ -110,7 +121,6 @@ export default function FoodDetails({ foodId, handleBackToSearch, user }) {
             alert('Error logging meal. Please try again.');
         }
     };
-    
 
     return (
         <div>
@@ -118,11 +128,11 @@ export default function FoodDetails({ foodId, handleBackToSearch, user }) {
             {error && <p className="text-red-500">{error}</p>}
             {foodDetails && (
                 <div>
-                    <h2 className="text-xl font-bold">{foodDetails.food_name}</h2>
-                    <p>Calories: {foodDetails.nf_calories || 0} kcal</p>
-                    <p>Protein: {foodDetails.nf_protein || 0} g</p>
-                    <p>Fat: {foodDetails.nf_total_fat || 0} g</p>
-                    <p>Carbs: {foodDetails.nf_total_carbohydrate || 0} g</p>
+                    <h2 className="text-xl font-bold text-black text-center">{foodDetails.food_name}</h2>
+                    <p className="text-black pt-3 text-center">Calories: {foodDetails.nf_calories || 0} kcal</p>
+                    <p className="text-black text-center">Protein: {foodDetails.nf_protein || 0} g</p>
+                    <p className="text-black text-center">Fat: {foodDetails.nf_total_fat || 0} g</p>
+                    <p className="text-black text-center">Carbs: {foodDetails.nf_total_carbohydrate || 0} g</p>
 
                     <div className="mt-4">
                         <label className="block mb-2">Meal Type:</label>
@@ -173,19 +183,26 @@ export default function FoodDetails({ foodId, handleBackToSearch, user }) {
                             className="p-2 border rounded-md w-full text-black"
                         />
                     </div>
+                    <div className="flex justify-center">
+                        <button
+                            onClick={handleBackToSearch}
+                            className="bg-gray-500 text-white p-2 rounded mt-4 mr-2 px-4"
+                        >
+                            Back to Search
+                        </button>
+                        <button
+                            onClick={handleMealLog}
+                            className="bg-blue-500 text-white p-2 rounded mt-4 ml-2 px-4"
+                        >
+                            Log Meal
+                        </button>
+                    </div>
+                </div>
+            )}
 
-                    <button
-                        onClick={handleMealLog}
-                        className="bg-green-500 text-white p-2 rounded mt-4"
-                    >
-                        Log Meal
-                    </button>
-                    <button
-                        onClick={handleBackToSearch}
-                        className="bg-gray-500 text-white p-2 rounded ml-2"
-                    >
-                        Back to Search
-                    </button>
+            {showSuccessModal && (
+                <div className="fixed bottom-16 left-1/2 transform -translate-x-1/2 bg-green-500 text-white p-6 rounded-lg shadow-xl border-4 border-green-600">
+                    <p className="font-semibold">Successfully added food!</p>
                 </div>
             )}
         </div>

@@ -20,55 +20,61 @@ const MacroDataSection = ({ selectedDate }) => {
         carbohydrates: { label: "Carbs", current: 0, max: 80, scale: "g" },
     });
 
-    const fetchLogsAndCalculateMacros = async (date) => {
-        try {
-            const response = await api.get("/daily_logs", { firebaseUid, date });
-
-            if (response.status === 200 && response.data) {
-                console.log("API Response:", response.data);
-
-                let log;
-                if (response.data.length !== 0) {
-                    const requestedDate = new Date(date);
-                    requestedDate.setUTCHours(0, 0, 0, 0);
-
-                    const lastLog = new Date(response.data[0].date);
-                    lastLog.setUTCHours(0, 0, 0, 0);
-
-                    if (requestedDate.getTime() !== lastLog.getTime()) {
-                        console.log("CHART - Logs found, but none for the selected date.");
-                        log = {};
-                    } else {
-                        console.log("CHART - Log found for the selected date.");
-                        log = response.data[0];
-                    }
-                } else {
-                    console.log("CHART - No meals found.");
-                    log = {};
-                }
-
-                const totalNutrition = log.dailyTotal || {
-                    calories: 0,
-                    fat: 0,
-                    protein: 0,
-                    carbohydrates: 0,
-                };
-
-                setMacros({
-                    calories: { label: "Kcal", current: totalNutrition.calories || 0, max: 2000 },
-                    protein: { label: "Proteins", current: totalNutrition.protein || 0, max: 150, scale: "g" },
-                    fat: { label: "Fats", current: totalNutrition.fat || 0, max: 70, scale: "g" },
-                    carbohydrates: { label: "Carbs", current: totalNutrition.carbohydrates || 0, max: 80, scale: "g" },
-                });
-            }
-        } catch (error) {
-            console.error("Error fetching logs:", error);
-        }
-    };
 
     useEffect(() => {
-        fetchLogsAndCalculateMacros(selectedDate); // Fetch macros based on the selected date
-    }, [refreshKey, selectedDate]); // Update when refreshKey or selectedDate changes
+        const fetchLogsAndCalculateMacros = async (date) => {
+            try {
+    
+                const requestedDate = new Date(date);
+                requestedDate.setHours(0, 0, 0, 0); 
+    
+                console.log("Requested Date:", requestedDate.toISOString()); 
+    
+                const response = await api.get("/daily_logs", { firebaseUid });
+    
+                if (response.status === 200 && response.data) {
+                    console.log("API Response:", response.data);
+    
+                    let log = {}; 
+    
+                    response.data.forEach((logData) => {
+                        const logDate = new Date(logData.date); 
+                        logDate.setHours(0, 0, 0, 0); 
+    
+                        console.log("Log Date:", logDate.toISOString()); 
+    
+                        if (logDate.getTime() === requestedDate.getTime()) {
+                            log = logData; 
+                        }
+                    });
+    
+                    if (Object.keys(log).length === 0) {
+                        console.log("CHART - No logs found for the selected date.");
+                    } else {
+                        console.log("CHART - Log found for the selected date.");
+                    }
+    
+                    const totalNutrition = log.dailyTotal || {
+                        calories: 0,
+                        fat: 0,
+                        protein: 0,
+                        carbohydrates: 0,
+                    };
+    
+                    setMacros({
+                        calories: { label: "Kcal", current: totalNutrition.calories || 0, max: 2000 },
+                        protein: { label: "Proteins", current: totalNutrition.protein || 0, max: 150, scale: "g" },
+                        fat: { label: "Fats", current: totalNutrition.fat || 0, max: 70, scale: "g" },
+                        carbohydrates: { label: "Carbs", current: totalNutrition.carbohydrates || 0, max: 80, scale: "g" },
+                    });
+                }
+            } catch (error) {
+                console.error("Error fetching logs:", error);
+            }
+        };
+
+        fetchLogsAndCalculateMacros(selectedDate)
+    }, [refreshKey, selectedDate, firebaseUid]); 
 
     const doughnutData = {
         labels: ["Current Calories", "Remaining"],
@@ -91,8 +97,9 @@ const MacroDataSection = ({ selectedDate }) => {
     };
 
     return (
-        <section className="px-6 py-4">
-            <div className="bg-slate-700 px-3 py-6 rounded-xl shadow-md w-full flex items-center justify-between">
+        <section className="px-6 pb-4">
+            
+            <div className="bg-slate-700 rounded-b-2xl px-3 pb-6 pt-2 shadow-md w-full flex items-center justify-between md:px-28">
                 {/* Doughnut Chart */}
                 <div className="md:pl-10">
                     <div className="relative">
@@ -109,7 +116,7 @@ const MacroDataSection = ({ selectedDate }) => {
 
                 {/* Macro Progress Bars */}
                 <div className="w-full max-w-sm pl-4 pr-2">
-                    {[ 
+                    {[
                         {
                             label: "Protein",
                             color: "bg-green-500",

@@ -54,7 +54,7 @@ export const ICON_SEARCH =
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth="2"
-            d="m15 15l6 6m-11-4a7 7 0 1 1 0-14a7 7 0 0 1 0 14" />
+            d="M8 12h4m0 0h4m-4 0v4m0-4V8m0 13a9 9 0 1 1 0-18a9 9 0 0 1 0 18" />
     </svg>
 
 export const ICON_CAMERA =
@@ -65,4 +65,53 @@ export const ICON_CAMERA =
             strokeLinejoin="round"
             strokeWidth="2"
             d="M9.489 7H6.2c-1.12 0-1.68 0-2.108.218a2 2 0 0 0-.874.874C3 8.52 3 9.08 3 10.2v5.6c0 1.12 0 1.68.218 2.107c.192.377.497.683.874.875c.427.218.987.218 2.105.218h11.606c1.118 0 1.677 0 2.104-.218a2 2 0 0 0 .875-.875c.218-.427.218-.986.218-2.104v-5.606c0-1.118 0-1.678-.218-2.105a2 2 0 0 0-.875-.874C19.48 7 18.92 7 17.8 7h-3.29M9.49 7h.062M9.49 7h.062M9.49 7c-.106 0-.166 0-.213-.006a1 1 0 0 1-.867-1.203a3 3 0 0 1 .08-.257l.001-.006c.052-.154.077-.23.106-.299a2 2 0 0 1 1.699-1.224C10.368 4 10.449 4 10.61 4h2.778c.162 0 .243 0 .317.005a2 2 0 0 1 1.698 1.224c.029.068.054.145.106.3c.046.138.07.207.08.262a1 1 0 0 1-.866 1.203A2 2 0 0 1 14.51 7M9.55 7h4.898m0 0h.062m-.062 0h.062M12 16a3 3 0 1 1 0-6a3 3 0 0 1 0 6" />
+    </svg>
+
+export const ICON_R_ARROW =
+    <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24">
+        <path fill="none"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="M5 12h14m0 0l-6-6m6 6l-6 6" />
+    </svg>
+
+export const ICON_L_ARROW =
+    <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24">
+        <path fill="none"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2" d="M19 12H5m0 0l6 6m-6-6l6-6" />
+    </svg>
+
+export const ICON_D_ARROW =
+    <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24">
+        <path fill="none"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2" d="m19 9l-7 7l-7-7" />
+    </svg>
+
+export const ICON_U_ARROW =
+    <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24">
+        <path fill="none"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="m5 16l7-7l7 7" />
+    </svg>
+
+
+export const ICON_TRASH =
+    <svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" viewBox="0 0 24 24">
+        <path fill="none"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="M14 10v7m-4-7v7M6 6v11.8c0 1.12 0 1.68.218 2.108a2 2 0 0 0 .874.874c.427.218.987.218 2.105.218h5.606c1.118 0 1.677 0 2.104-.218c.377-.192.683-.498.875-.874c.218-.428.218-.987.218-2.105V6M6 6h2M6 6H4m4 0h8M8 6c0-.932 0-1.398.152-1.765a2 2 0 0 1 1.082-1.083C9.602 3 10.068 3 11 3h2c.932 0 1.398 0 1.765.152a2 2 0 0 1 1.083 1.083C16 4.602 16 5.068 16 6m0 0h2m0 0h2" />
     </svg>

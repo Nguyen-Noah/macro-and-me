@@ -1,7 +1,8 @@
 import Log from "../models/Log.js";
 import Meal from "../models/Meal.js";
 import User from "../models/User.js";
-import { findOrCreateFood } from "../services/foodFactory.js";
+import Food from '../models/Food.js';
+import { createFood } from "../services/foodFactory.js";
 import { findOrCreateLog } from "../services/logFactory.js";
 import { findOrCreateMeal } from "../services/mealFactory.js";
 
@@ -17,7 +18,7 @@ export const createMeal = async (req, res) => {
         }
 
         const dailyLog = await findOrCreateLog(user._id);
-        const newFood = await findOrCreateFood({ name, calories, fat, carbohydrates, protein });
+        const newFood = await createFood({ name, calories, fat, carbohydrates, protein });
         const meal = await findOrCreateMeal(user._id, mealType, newFood._id);
 
         // set the selected meal in the log to this one then save
@@ -33,7 +34,7 @@ export const createMeal = async (req, res) => {
         res.status(201).json({ message: 'Meal logged successfully!', food: newFood });
     } catch (error) {
         console.error('Error adding meal:', error);
-        res.status(500).json({ message: 'Error adding meal'});
+        res.status(500).json({ message: 'Error adding meal' });
     }
 };
 
@@ -62,50 +63,99 @@ export const getMealByType = async (req, res) => {
         res.status(200).json({ mealId: dailyLog[mealType] });
     } catch (error) {
         console.log('Error fetching meal:', error);
-        res.status(500).json({ message: 'Internal server error'});
+        res.status(500).json({ message: 'Internal server error' });
     }
 };
 
 
-/*
-USAGE: make sure to use api.delete() for this call (reference the route in mealRoutes.js)
-       also ensure that all of the variable names that are passed in match what are expected, namely:
-       fireaseUid, mealType, foodId.
-       example payload
-        {
-            "firebaseUid": "PecTgywMSke8eZjaHvLvk4colCz1",
-            "mealType": "breakfast",
-            "foodId": "6751f84d9a2a8d48cbdb70fb"
-        }
-       the foodIds are all provided in the logs that are sent to the frontend
-*/
 export const removeFood = async (req, res) => {
-    const { firebaseUid, mealType, foodId } = req.body;
+    const { firebaseUid, mealType, foodId, date } = req.body;
 
     try {
-        const user = await User.findOne({ firebaseUid: firebaseUid });
+        const user = await User.findOne({ firebaseUid });
         if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+            return res.status(404).json({ message: "User not found" });
         }
 
-        const recentLog = await Log.findOne({ userId: user._id })
-                                    .sort({ createdAt: -1 })
-                                    .exec();
+        // Query all logs for the user and loop through them
+        const logs = await Log.find({ userId: user._id });
 
-        const target = recentLog[mealType];
+        if (!logs || logs.length === 0) {
+            return res.status(404).json({ message: "No logs found for the user" });
+        }
+
+        // Find the log for the specific date
+        let selectedLog = null;
+        for (let log of logs) {
+            const logDate = new Date(log.date);
+            const selectedDate = new Date(date);
+            logDate.setHours(0, 0, 0, 0);
+            selectedDate.setHours(0, 0, 0, 0);
+
+            if (logDate.getTime() === selectedDate.getTime()) {
+                selectedLog = log;
+                break;
+            }
+        }
+
+        if (!selectedLog) {
+            return res.status(404).json({ message: "Log not found for the selected date" });
+        }
+
+        // Ensure mealType is correct, and pull the foodId from that meal
+        const meal = selectedLog[mealType];
+        if (!meal) {
+            return res.status(404).json({ message: `${mealType} not found for the selected date` });
+        }
+
+        // Perform the deletion from the meal
         const updatedMeal = await Meal.findByIdAndUpdate(
-            target,
+            meal,
             { $pull: { obj: foodId } },
             { new: true }
         );
 
         if (!updatedMeal) {
-            return res.stats(404).json({ error: 'Meal not found.' });
+            return res.status(404).json({ message: "Meal not found." });
         }
 
-        res.status(200).json(updatedMeal);
+        // Remove the food entry from the Food collection
+        const deletedFood = await Food.findByIdAndDelete(foodId);
+        if (!deletedFood) {
+            return res.status(404).json({ message: "Food not found in the Food collection" });
+        }
+
+        // Check if the meal is now empty, and delete if so
+        if (updatedMeal.obj.length === 0) {
+            await Meal.findByIdAndDelete(meal);
+
+            // Remove the reference to the deleted meal from the log
+            selectedLog[mealType] = null;
+            await selectedLog.save();
+        }
+
+        // Check if the log has any remaining meals, and delete if empty
+        const remainingMeals = ["breakfast", "lunch", "dinner", "snacks"].some(
+            (mealType) => selectedLog[mealType] !== null
+        );
+
+        if (!remainingMeals) {
+            await Log.findByIdAndDelete(selectedLog._id);
+
+            // Remove the reference to the deleted log from the user
+            user.daily_logs = user.daily_logs.filter(
+                (logId) => logId.toString() !== selectedLog._id.toString()
+            );
+            await user.save();
+        }
+
+        res.status(200).json({
+            message: "Food, meal, and log cleaned up successfully if necessary",
+            deletedFood,
+            updatedMeal,
+        });
     } catch (error) {
-        console.error('Error removing food:', error);
-        res.status(500).json({ message: 'Error removing food'});
+        console.error("Error removing food:", error);
+        res.status(500).json({ message: "Error removing food" });
     }
-}
+};
