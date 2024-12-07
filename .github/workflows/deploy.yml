@@ -30,7 +30,6 @@ jobs:
       - name: Create server app.yaml
         working-directory: ./server
         run: |
-          echo "runtime: nodejs" > app.yaml
           echo "env: flex" >> app.yaml
           echo "entrypoint: npm start" >> app.yaml
           echo "env_variables:" >> app.yaml
@@ -45,7 +44,6 @@ jobs:
       - name: Create frontend app.yaml
         working-directory: ./macro-and-me
         run: |
-          echo "runtime: nodejs" > app.yaml
           echo "env: flex" >> app.yaml
           echo "entrypoint: npm run start" >> app.yaml
           echo "env_variables:" >> app.yaml
