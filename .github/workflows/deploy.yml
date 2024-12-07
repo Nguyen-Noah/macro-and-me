@@ -30,6 +30,7 @@ jobs:
       - name: Install and build frontend
         run: |
           cd macro-and-me
+          pwd
           npm ci
           npm run build
 
