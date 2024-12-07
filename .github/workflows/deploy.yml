@@ -18,7 +18,7 @@ jobs:
       - name: Authenticate with GCP
         uses: google-github-actions/auth@v1
         with:
-          service_account_key: ${{ secretes.GCP_SA_KEY }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
 
       # Step 3: Set up Google Cloud SDK
       - name: Set up Google Cloud SDK
