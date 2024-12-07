@@ -1,4 +1,4 @@
-name: Deploy MERN App to GCP
+name: Deploy App
 
 on:
   push:
@@ -33,9 +33,6 @@ jobs:
           echo "runtime: nodejs20" > app.yaml
           echo "env: flex" >> app.yaml
           echo "entrypoint: npm start" >> app.yaml
-          echo "automatic_scaling:" >> app.yaml
-          echo "  min_instances: 1" >> app.yaml
-          echo "  max_instances: 5" >> app.yaml
           echo "env_variables:" >> app.yaml
           echo "  MONGO_URI: '${{ secrets.MONGO_URI }}'" >> app.yaml
           echo "  OPENAI_API_KEY: '${{ secrets.OPENAI_API_KEY }}'" >> app.yaml
@@ -51,9 +48,6 @@ jobs:
           echo "runtime: nodejs20" > app.yaml
           echo "env: flex" >> app.yaml
           echo "entrypoint: npm run start" >> app.yaml
-          echo "automatic_scaling:" >> app.yaml
-          echo "  min_instances: 1" >> app.yaml
-          echo "  max_instances: 5" >> app.yaml
           echo "env_variables:" >> app.yaml
           echo "  REACT_APP_NUTRITIONIX_APP_ID: '${{ secrets.REACT_APP_NUTRITIONIX_APP_ID }}'" >> app.yaml
           echo "  REACT_APP_NUTRITIONIX_APP_KEY: '${{ secrets.REACT_APP_NUTRITIONIX_APP_KEY }}'" >> app.yaml
