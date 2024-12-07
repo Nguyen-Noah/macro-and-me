@@ -29,13 +29,13 @@ jobs:
       # Step 4: Install dependencies and build frontend
       - name: Install and build frontend
         run: |
-          cd macro-and-me
           pwd
           npm ci
           npm run build
 
       - name: Copy frontend build to server
         run: |
+          pwd
           cp -r macro-and-me/build server/public
 
       # Step 5: Deploy to App Engine
