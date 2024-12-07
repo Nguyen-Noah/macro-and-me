@@ -49,22 +49,10 @@ jobs:
         run: |
           cp -r macro-and-me/build server/public
 
-      - name: Ensure staging bucket exists
-        run: |
-          if ! gsutil ls "gs://macro-and-me-staging/" > /dev/null 2>&1; then
-            gsutil mb -p ${{ secrets.GCP_PROJECT_ID }} -l us-central1 gs://macro-and-me-staging/
-          fi
-
-      - name: Set default bucket permissions
-        run: |
-          gcloud storage buckets add-iam-policy-binding gs://macro-and-me-staging \
-            --member="serviceAccount:${{ secrets.GCP_PROJECT_ID }}@appspot.gserviceaccount.com" \
-            --role="roles/storage.admin"
-
       # Step 5: Deploy to App Engine
       - name: Deploy to App Engine
         run: |
           cd server
           ls
           npm ci
-          gcloud app deploy --quiet
+          gcloud app deploy --quiet --bucket=gs://macro-and-me-staging
