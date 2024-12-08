@@ -68,6 +68,5 @@ jobs:
       - name: Deploy to App Engine
         run: |
           cd server
-          cat app.yaml
           npm ci
           gcloud app deploy --quiet --bucket=gs://macro-and-me-staging
