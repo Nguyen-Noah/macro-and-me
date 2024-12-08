@@ -38,7 +38,6 @@ jobs:
           echo "REACT_APP_FIREBASE_APP_ID=${{ secrets.REACT_APP_FIREBASE_APP_ID }}" >> macro-and-me/.env.local
           echo "REACT_APP_FIREBASE_MEASUREMENT_ID=${{ secrets.REACT_APP_FIREBASE_MEASUREMENT_ID }}" >> macro-and-me/.env.local
           echo "REACT_APP_USDA_API_KEY=${{ secrets.REACT_APP_USDA_API_KEY }}" >> macro-and-me/.env.local
-          ls macro-and-me
 
       # Step 4: Install dependencies and build frontend
       - name: Install and build frontend
@@ -49,6 +48,7 @@ jobs:
 
       - name: Generate app.yaml
         run: |
+          touch server/app.yaml
           echo "runtime: nodejs" > server/app.yaml
           echo "runtime_config:" >> server/app.yaml
           echo "  operating_system: 'ubuntu22'" >> server/app.yaml
@@ -62,9 +62,7 @@ jobs:
       - name: Copy frontend build to server
         run: |
           cp -r macro-and-me/build server
-          ls
           mv server/build server/public
-          ls
 
       # Step 5: Deploy to App Engine
       - name: Deploy to App Engine
