@@ -38,7 +38,6 @@ jobs:
           echo "REACT_APP_FIREBASE_APP_ID=${{ secrets.REACT_APP_FIREBASE_APP_ID }}" >> macro-and-me/.env.local
           echo "REACT_APP_FIREBASE_MEASUREMENT_ID=${{ secrets.REACT_APP_FIREBASE_MEASUREMENT_ID }}" >> macro-and-me/.env.local
           echo "REACT_APP_USDA_API_KEY=${{ secrets.REACT_APP_USDA_API_KEY }}" >> macro-and-me/.env.local
-          ls macro-and-me
 
       # Step 4: Install dependencies and build frontend
       - name: Install and build frontend
@@ -49,15 +48,18 @@ jobs:
 
       - name: Generate app.yaml
         run: |
-          echo "runtime: nodejs" > server/app.yaml
-          echo "runtime_config:" >> server/app.yaml
-          echo "  operating_system: 'ubuntu22'" >> server/app.yaml
-          echo "  runtime_version: '20'" >> server/app.yaml
-          echo "env: flex" >> server/app.yaml
-          echo "entrypoint: npm start" >> server/app.yaml
-          echo "env_variables:" >> server/app.yaml
-          echo "  MONGO_URI: '${{ secrets.MONGO_URI }}'" >> server/app.yaml
-          echo "  OPENAI_API_KEY: '${{ secrets.OPENAI_API_KEY }}'" >> server/app.yaml
+          touch server/app.yaml
+          echo runtime: nodejs > server/app.yaml
+          echo runtime_config: >> server/app.yaml
+          echo   operating_system: "ubuntu22" >> server/app.yaml
+          echo   runtime_version: "20" >> server/app.yaml
+          echo env: flex >> server/app.yaml
+          echo entrypoint: npm start >> server/app.yaml
+          echo env_variables: >> server/app.yaml
+          echo   MONGO_URI: "$secrets.MONGO_URI" >> server/app.yaml
+          echo   OPENAI_API_KEY: "$secrets.OPENAI_API_KEY" >> server/app.yaml
+
+          cat server/app.yaml
 
       - name: Copy frontend build to server
         run: |
