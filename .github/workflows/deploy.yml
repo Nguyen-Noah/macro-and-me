@@ -49,16 +49,15 @@ jobs:
       - name: Generate app.yaml
         run: |
           touch server/app.yaml
-          echo runtime: nodejs > server/app.yaml
-          echo runtime_config: >> server/app.yaml
-          echo   operating_system: "ubuntu22" >> server/app.yaml
-          echo   runtime_version: "20" >> server/app.yaml
-          echo env: flex >> server/app.yaml
-          echo entrypoint: npm start >> server/app.yaml
-          echo env_variables: >> server/app.yaml
-          echo   MONGO_URI: "$secrets.MONGO_URI" >> server/app.yaml
-          echo   OPENAI_API_KEY: "$secrets.OPENAI_API_KEY" >> server/app.yaml
-
+          echo "runtime: nodejs" > server/app.yaml
+          echo "runtime_config:" >> server/app.yaml
+          echo "  operating_system: 'ubuntu22'" >> server/app.yaml
+          echo "  runtime_version: '20'" >> server/app.yaml
+          echo "env: flex" >> server/app.yaml
+          echo "entrypoint: npm start" >> server/app.yaml
+          echo "env_variables:" >> server/app.yaml
+          echo "  MONGO_URI: '${{ secrets.MONGO_URI }}'" >> server/app.yaml
+          echo "  OPENAI_API_KEY: '${{ secrets.OPENAI_API_KEY }}'" >> server/app.yaml
           cat server/app.yaml
 
       - name: Copy frontend build to server
