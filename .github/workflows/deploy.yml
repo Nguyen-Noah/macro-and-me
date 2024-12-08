@@ -38,6 +38,7 @@ jobs:
           echo "REACT_APP_FIREBASE_APP_ID=${{ secrets.REACT_APP_FIREBASE_APP_ID }}" >> macro-and-me/.env.local
           echo "REACT_APP_FIREBASE_MEASUREMENT_ID=${{ secrets.REACT_APP_FIREBASE_MEASUREMENT_ID }}" >> macro-and-me/.env.local
           echo "REACT_APP_USDA_API_KEY=${{ secrets.REACT_APP_USDA_API_KEY }}" >> macro-and-me/.env.local
+          echo "REACT_APP_API_URL=${{ secrets.REACT_APP_API_URL }}" >> macro-and-me/.env.local
 
       # Step 4: Install dependencies and build frontend
       - name: Install and build frontend
@@ -58,6 +59,11 @@ jobs:
           echo "env_variables:" >> server/app.yaml
           echo "  MONGO_URI: '${{ secrets.MONGO_URI }}'" >> server/app.yaml
           echo "  OPENAI_API_KEY: '${{ secrets.OPENAI_API_KEY }}'" >> server/app.yaml
+          echo "handlers:" >> server/app.yaml
+          echo "- url: /static" >> server/app.yaml
+          echo "  static_dir: public/static" >> server.app.yaml
+          echo "- url: /(.*)" >> server/app.yaml
+          echo "  script: auto" >> server/app.yaml
 
       - name: Copy frontend build to server
         run: |
