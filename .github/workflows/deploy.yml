@@ -60,6 +60,11 @@ jobs:
           echo "env_variables:" >> server/app.yaml
           echo "  MONGO_URI: '${{ secrets.MONGO_URI }}'" >> server/app.yaml
           echo "  OPENAI_API_KEY: '${{ secrets.OPENAI_API_KEY }}'" >> server/app.yaml
+          echo "handlers:" >> server/app.yaml
+          echo "- url: /static" >> server/app.yaml
+          echo "  static_dir: public/static" >> server.app.yaml
+          echo "- url: /(.*)" >> server/app.yaml
+          echo "  script: auto" >> server/app.yaml
 
       - name: Copy frontend build to server
         run: |
