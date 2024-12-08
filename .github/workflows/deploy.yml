@@ -44,7 +44,6 @@ jobs:
       - name: Install and build frontend
         run: |
           cd macro-and-me
-          cat .env.local
           npm ci
           npm run build
 
