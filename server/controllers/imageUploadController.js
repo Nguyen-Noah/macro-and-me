@@ -3,6 +3,7 @@ import { zodResponseFormat } from 'openai/helpers/zod';
 import { z } from 'zod';
 
 const Nutrition = z.object({
+    name:z.string(),
     calories: z.number(),
     fat: z.number(),
     carbohydrates: z.number(),

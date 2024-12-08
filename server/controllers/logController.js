@@ -1,6 +1,7 @@
 import Food from "../models/Food.js";
 import Log from "../models/Log.js";
 import Meal from "../models/Meal.js";
+import User from "../models/User.js";
 
 // fetching and processing foods for a single meal
 const processMeal = async (mealName, mealId) => {
@@ -12,11 +13,18 @@ const processMeal = async (mealName, mealId) => {
             totals.calories += food.calories || 0;
             totals.fat += food.fat || 0;
             totals.protein += food.protein || 0;
-            totals.carbs += food.carbs || 0;
+            totals.carbohydrates += food.carbohydrates || 0;
             return totals;
         },
-        { calories: 0, fat: 0, protein: 0, carbs: 0 }
+        { calories: 0, fat: 0, protein: 0, carbohydrates: 0 }
     );
+    
+    totalNutrition.calories = Math.round(totalNutrition.calories);
+    totalNutrition.fat = Math.round(totalNutrition.fat);
+    totalNutrition.protein = Math.round(totalNutrition.protein); 
+    totalNutrition.carbohydrates = Math.round(totalNutrition.carbohydrates);
+    
+    
 
     return {
         [mealName]: {
@@ -44,10 +52,10 @@ const calculateDailyTotal = (dayMeals) => {
             totals.calories += meal.totalNutrition.calories;
             totals.fat += meal.totalNutrition.fat;
             totals.protein += meal.totalNutrition.protein;
-            totals.carbs += meal.totalNutrition.carbs;
+            totals.carbohydrates += meal.totalNutrition.carbohydrates;
             return totals;
         },
-        { calories: 0, fat: 0, protein: 0, carbs: 0 }
+        { calories: 0, fat: 0, protein: 0, carbohydrates: 0 }
     );
 };
 
@@ -94,8 +102,8 @@ const fetchFoodsForMeals = async (meals) => {
 
 export const getUserDailyLogs = async (req, res) => {
     try {
-        const userId = req.params.userId;
-        const dailyLogs = await getLogs(userId);
+        const mongoId = await User.findOne({ firebaseUid: req.query.firebaseUid });
+        const dailyLogs = await getLogs(mongoId);
 
         res.status(200).json(dailyLogs);
     } catch (error) {

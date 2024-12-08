@@ -5,12 +5,12 @@ const Modal = ({ isOpen, onClose, children }) => {
 
     return (
         <motion.div
-            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+            className="fixed inset-0 px-6 bg-black bg-opacity-50 flex justify-center items-center z-50 overflow-scroll rounded-lg"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
         >
-            <div className="bg-slate-700 p-4 rounded-lg max-w-lg w-full relative mx-6">
+            <div className="px-6 py-6 rounded-lg max-w-lg w-full relative bg-white">
                 <button
                     className="absolute top-2 right-2 text-gray-500 hover:text-gray-800"
                     onClick={onClose}
