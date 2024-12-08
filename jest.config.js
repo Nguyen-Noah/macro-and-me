@@ -1,0 +1,1 @@
+export const modulePathIgnorePatterns = ['<rootDir>/macro-and-me/package.json'];
