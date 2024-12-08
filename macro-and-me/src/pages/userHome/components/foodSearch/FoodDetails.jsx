@@ -20,12 +20,10 @@ export default function FoodDetails({ foodId, handleBackToSearch, user, selected
 
 
     useEffect(() => {
-
-        console.log(foodId)
         const fetchFoodDetails = async () => {
             try {
-                const appId = process.env.REACT_APP_NUTRITIONIX_APP_ID3;
-                const appKey = process.env.REACT_APP_NUTRITIONIX_APP_KEY3;
+                const appId = process.env.REACT_APP_NUTRITIONIX_APP_ID;
+                const appKey = process.env.REACT_APP_NUTRITIONIX_APP_KEY;
 
                 let response;
 

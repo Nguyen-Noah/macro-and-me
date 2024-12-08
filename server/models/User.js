@@ -6,9 +6,9 @@ const userSchema = new mongoose.Schema(
         displayName: { type: String },
         email: { type: String },
         userData: {
-            height: { type: Number, required: true }, 
-            weight: { type: Number, required: true }, 
-            age: { type: Number, required: true },
+            height: { type: Number }, 
+            weight: { type: Number }, 
+            age: { type: Number },
             activityLevel: { 
                 type: String, 
                 enum: ['sedentary', 'lightly_active', 'moderately_active', 'very_active', 'extra_active'],

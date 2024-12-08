@@ -101,14 +101,8 @@ const MealSection = ({ selectedDate }) => {
         }));
     };
 
-    // Handle delete food
     const handleDeleteFood = async (mealKey, foodIndex) => {
         const foodId = editedLogs[mealKey]?.foods[foodIndex]._id;
-    
-        console.log("firebaseUid:", firebaseUid);
-        console.log("mealType:", mealKey);
-        console.log("foodId:", foodId);
-        console.log("selectedDate:", selectedDate); // Pass the selectedDate to the backend
     
         try {
             const response = await api.delete('/remove_food', {
@@ -116,14 +110,14 @@ const MealSection = ({ selectedDate }) => {
                     firebaseUid,
                     mealType: mealKey,
                     foodId,
-                    date: selectedDate, // Include selectedDate to ensure the correct log is targeted
+                    date: selectedDate,
                 },
             });
     
             console.log("Food deleted successfully:", response.data);
-            triggerRefresh(); // Refresh the data after deletion
+            triggerRefresh();
         } catch (error) {
-            setShowError(true); // Set error on delete failure
+            setShowError(true);
             console.error("Error deleting food:", error);
         }
     };

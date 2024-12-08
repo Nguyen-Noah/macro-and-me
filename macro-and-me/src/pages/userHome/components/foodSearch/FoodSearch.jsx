@@ -23,8 +23,8 @@ export default function FoodSearch({ closePopup, selectedDate, onSuccess}) {
         setResults([]);
 
         try {
-            const appId = process.env.REACT_APP_NUTRITIONIX_APP_ID3;
-            const appKey = process.env.REACT_APP_NUTRITIONIX_APP_KEY3;
+            const appId = process.env.REACT_APP_NUTRITIONIX_APP_ID;
+            const appKey = process.env.REACT_APP_NUTRITIONIX_APP_KEY;
 
             const response = await fetch(
                 `https://trackapi.nutritionix.com/v2/search/instant?query=${trimmedQuery}`,
