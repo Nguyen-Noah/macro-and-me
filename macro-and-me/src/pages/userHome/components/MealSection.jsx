@@ -26,6 +26,7 @@ const MealSection = ({ selectedDate }) => {
         try {
             const response = await api.get("daily_logs", { firebaseUid });
             const logs = response.data;
+            console.log(logs)
 
             if (logs.length !== 0) {
                 const requestedDate = new Date(date);
@@ -34,8 +35,12 @@ const MealSection = ({ selectedDate }) => {
                 let foundLog = null;
 
                 logs.forEach((logData) => {
+                    console.log(logData.date)
                     const logDate = new Date(logData.date);
-                    logDate.setHours(0, 0, 0, 0);
+                    logDate.setHours(logDate.getHours() + 5);
+
+                    console.log('log date',logDate)
+                    console.log('req date', requestedDate)
 
                     if (logDate.getTime() === requestedDate.getTime()) {
                         foundLog = logData;
