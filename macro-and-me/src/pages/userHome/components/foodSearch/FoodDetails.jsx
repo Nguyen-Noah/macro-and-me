@@ -2,8 +2,6 @@ import { useState, useEffect } from 'react';
 import api from '../../../../utils/api';
 import { useRefresh } from '../../context/RefreshContext';
 
-let _ = require("underscore");
-
 export default function FoodDetails({ foodId, handleBackToSearch, user, selectedDate, closePopup, onSuccess }) {
     const { triggerRefresh } = useRefresh();
     const [foodDetails, setFoodDetails] = useState(null);

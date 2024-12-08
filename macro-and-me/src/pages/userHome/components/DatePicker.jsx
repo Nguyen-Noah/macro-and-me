@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { ICON_L_ARROW, ICON_R_ARROW } from "../../../utils/svg";
 
 const DatePicker = ({ selectedDate, onDateChange }) => {

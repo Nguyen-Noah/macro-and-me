@@ -9,7 +9,6 @@ const MealSection = ({ selectedDate }) => {
     const { triggerRefresh, refreshKey } = useRefresh();
 
     const [showError, setShowError] = useState(false);
-    const [logs, setLogs] = useState([]);
     const [editedLogs, setEditedLogs] = useState({});
     const [selectedFood, setSelectedFood] = useState(null); // State for selected food
     const [showModal, setShowModal] = useState(false); // State for modal visibility
@@ -27,7 +26,6 @@ const MealSection = ({ selectedDate }) => {
         try {
             const response = await api.get("daily_logs", { firebaseUid });
             const logs = response.data;
-            setLogs(logs || []);
 
             if (logs.length !== 0) {
                 const requestedDate = new Date(date);
@@ -122,7 +120,7 @@ const MealSection = ({ selectedDate }) => {
         }
     };
     
-
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         fetchLogs(selectedDate);
     }, [refreshKey, selectedDate]);

@@ -88,6 +88,7 @@ const MacroDataSection = ({ selectedDate}) => {
         }
     };
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         fetchProfileData();
         fetchLogsAndCalculateMacros(selectedDate);
