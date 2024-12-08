@@ -120,9 +120,9 @@ const MealSection = ({ selectedDate }) => {
         }
     };
     
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         fetchLogs(selectedDate);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [refreshKey, selectedDate]);
 
     return (

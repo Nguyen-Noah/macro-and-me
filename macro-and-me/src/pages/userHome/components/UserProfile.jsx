@@ -63,7 +63,6 @@ const UserProfile = ({ onClose }) => {
     const toMetricHeight = (inches) => (inches * 2.54).toFixed(1);
     const toMetricWeight = (pounds) => (pounds / 2.20462).toFixed(1);
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         if (!editable) return;
 
@@ -76,6 +75,7 @@ const UserProfile = ({ onClose }) => {
                 ? toMetricWeight(prev.weight)
                 : toImperialWeight(prev.weight),
         }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [useMetric]);
 
     // Calculate TDEE
