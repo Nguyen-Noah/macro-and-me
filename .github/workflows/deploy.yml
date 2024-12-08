@@ -64,6 +64,11 @@ jobs:
           cp -r macro-and-me/build server
           mv server/build server/public
 
+      - name: Debug the public folder
+        run: |
+          ls -la server/public
+          ls -la server/public/static/js
+
       # Step 5: Deploy to App Engine
       - name: Deploy to App Engine
         run: |
