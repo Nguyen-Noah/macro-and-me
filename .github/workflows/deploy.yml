@@ -38,11 +38,13 @@ jobs:
           echo "REACT_APP_FIREBASE_APP_ID=${{ secrets.REACT_APP_FIREBASE_APP_ID }}" >> macro-and-me/.env.local
           echo "REACT_APP_FIREBASE_MEASUREMENT_ID=${{ secrets.REACT_APP_FIREBASE_MEASUREMENT_ID }}" >> macro-and-me/.env.local
           echo "REACT_APP_USDA_API_KEY=${{ secrets.REACT_APP_USDA_API_KEY }}" >> macro-and-me/.env.local
+          echo "REACT_APP_API_URL=${{ secrets.REACT_APP_API_URL }}" >> macro-and-me/.env.local
 
       # Step 4: Install dependencies and build frontend
       - name: Install and build frontend
         run: |
           cd macro-and-me
+          cat .env.local
           npm ci
           npm run build
 
