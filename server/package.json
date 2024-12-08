@@ -16,7 +16,7 @@
     "express": "^4.21.0",
     "form-data": "^4.0.1",
     "macro-and-me": "file:..",
-    "mongodb": "^6.9.0",
+    "mongodb": "^6.11.0",
     "mongoose": "^8.7.2",
     "multer": "^1.4.5-lts.1",
     "openai": "^4.68.1",

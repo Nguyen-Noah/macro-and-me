@@ -24,3 +24,6 @@ yarn-debug.log*
 yarn-error.log*
 /uploads
 /images
+
+server/app.yaml
+macro-and-me/app.yaml

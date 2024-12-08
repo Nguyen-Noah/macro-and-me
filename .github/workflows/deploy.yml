@@ -1,0 +1,72 @@
+name: Deploy App
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Authenticate with GCP
+      - name: Authenticate with GCP
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      # Step 3: Set up Google Cloud SDK
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: macro-and-me
+
+      - name: Set environment variables for frontend
+        run: | 
+          echo "REACT_APP_NUTRITIONIX_APP_ID=${{ secrets.REACT_APP_NUTRITIONIX_APP_ID }}" >> macro-and-me/.env.local
+          echo "REACT_APP_NUTRITIONIX_APP_KEY=${{ secrets.REACT_APP_NUTRITIONIX_APP_KEY }}" >> macro-and-me/.env.local
+          echo "REACT_APP_FIREBASE_API_KEY=${{ secrets.REACT_APP_FIREBASE_API_KEY }}" >> macro-and-me/.env.local
+          echo "REACT_APP_FIREBASE_AUTH_DOMAIN=${{ secrets.REACT_APP_FIREBASE_AUTH_DOMAIN }}" >> macro-and-me/.env.local
+          echo "REACT_APP_FIREBASE_PROJECT_ID=${{ secrets.REACT_APP_FIREBASE_PROJECT_ID }}" >> macro-and-me/.env.local
+          echo "REACT_APP_FIREBASE_STORAGE_BUCKET=${{ secrets.REACT_APP_FIREBASE_STORAGE_BUCKET }}" >> macro-and-me/.env.local
+          echo "REACT_APP_FIREBASE_MESSAGING_SENDER_ID=${{ secrets.REACT_APP_FIREBASE_MESSAGING_SENDER_ID }}" >> macro-and-me/.env.local
+          echo "REACT_APP_FIREBASE_APP_ID=${{ secrets.REACT_APP_FIREBASE_APP_ID }}" >> macro-and-me/.env.local
+          echo "REACT_APP_FIREBASE_MEASUREMENT_ID=${{ secrets.REACT_APP_FIREBASE_MEASUREMENT_ID }}" >> macro-and-me/.env.local
+          echo "REACT_APP_USDA_API_KEY=${{ secrets.REACT_APP_USDA_API_KEY }}" >> macro-and-me/.env.local
+
+      # Step 4: Install dependencies and build frontend
+      - name: Install and build frontend
+        run: |
+          cd macro-and-me
+          npm ci
+          npm run build
+
+      - name: Generate app.yaml
+        run: |
+          touch server/app.yaml
+          echo "runtime: nodejs" > server/app.yaml
+          echo "runtime_config:" >> server/app.yaml
+          echo "  operating_system: 'ubuntu22'" >> server/app.yaml
+          echo "  runtime_version: '20'" >> server/app.yaml
+          echo "env: flex" >> server/app.yaml
+          echo "entrypoint: npm start" >> server/app.yaml
+          echo "env_variables:" >> server/app.yaml
+          echo "  MONGO_URI: '${{ secrets.MONGO_URI }}'" >> server/app.yaml
+          echo "  OPENAI_API_KEY: '${{ secrets.OPENAI_API_KEY }}'" >> server/app.yaml
+
+      - name: Copy frontend build to server
+        run: |
+          cp -r macro-and-me/build server
+          mv server/build server/public
+
+      # Step 5: Deploy to App Engine
+      - name: Deploy to App Engine
+        run: |
+          cd server
+          npm ci
+          gcloud app deploy --quiet --bucket=gs://macro-and-me-staging
