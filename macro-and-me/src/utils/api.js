@@ -52,7 +52,9 @@ class API {
     }
 }
 
-const api = new API('http://localhost:5000/api'); // <- put this in .env eventually
+const baseURL =
+    process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const api = new API(baseURL);
 export default api;
 
 export const fetchUser = async (firebaseUid) => {
