@@ -6,6 +6,7 @@ const DatePicker = ({ selectedDate, onDateChange }) => {
     // Initialize currentDate by adding 1 day to the selectedDate
     const [currentDate, setCurrentDate] = useState(() => {
         const date = new Date(selectedDate);
+        date.setHours(date.getHours() + 5);
         return date;
     });
 

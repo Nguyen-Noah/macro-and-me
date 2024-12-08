@@ -45,7 +45,7 @@ const MacroDataSection = ({ selectedDate}) => {
     const fetchLogsAndCalculateMacros = async (date) => {
         try {
             const requestedDate = new Date(date);
-            requestedDate.setHours(0, 0, 0, 0); // Normalize date to midnight
+            requestedDate.setHours(requestedDate.getHours() + 5); // Normalize date to midnight
             
             const response = await api.get("/daily_logs", { firebaseUid });
 
@@ -55,7 +55,10 @@ const MacroDataSection = ({ selectedDate}) => {
                 // Find the log matching the selected date
                 response.data.forEach((logData) => {
                     const logDate = new Date(logData.date);
-                    logDate.setHours(0, 0, 0, 0);
+                    logDate.setHours(logDate.getHours() + 5);
+
+                    console.log('log date',logDate)
+                    console.log('req date', requestedDate)
 
                     if (logDate.getTime() === requestedDate.getTime()) {
                         log = logData;

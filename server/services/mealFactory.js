@@ -5,6 +5,7 @@ export const findOrCreateMeal = async (userId, mealType, newFoodId) => {
     try {
         const date = new Date();
         date.setHours(0, 0, 0, 0);
+        date.setHours(date.getHours() - 5);
 
         const query = {
             userId: userId,
