@@ -55,10 +55,9 @@ const MacroDataSection = ({ selectedDate}) => {
                 // Find the log matching the selected date
                 response.data.forEach((logData) => {
                     const logDate = new Date(logData.date);
-                    logDate.setHours(logDate.getHours() + 5);
-
-                    console.log('log date',logDate)
-                    console.log('req date', requestedDate)
+                    const offset = new Date().getTimezoneOffset() / 60;
+                    logDate.setHours(logDate.getHours() + offset);
+                    console.log('MacroData date:', logDate);
 
                     if (logDate.getTime() === requestedDate.getTime()) {
                         log = logData;

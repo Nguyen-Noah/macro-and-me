@@ -6,7 +6,9 @@ const DatePicker = ({ selectedDate, onDateChange }) => {
     // Initialize currentDate by adding 1 day to the selectedDate
     const [currentDate, setCurrentDate] = useState(() => {
         const date = new Date(selectedDate);
-        date.setHours(date.getHours() + 5);
+        const offset = new Date().getTimezoneOffset() / 60;
+        date.setHours(date.getHours() + offset);
+        console.log('date picker date:', date);
         return date;
     });
 

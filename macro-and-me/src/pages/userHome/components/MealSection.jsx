@@ -29,7 +29,9 @@ const MealSection = ({ selectedDate }) => {
 
             if (logs.length !== 0) {
                 const requestedDate = new Date(date);
-                requestedDate.setHours(requestedDate.getHours() + 5);
+                const offset = new Date().getTimezoneOffset() / 60;
+                requestedDate.setHours(requestedDate.getHours() + offset);
+                console.log('MealSection date:', requestedDate);
 
                 let foundLog = null;
 

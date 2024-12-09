@@ -15,7 +15,10 @@ export default function Home() {
     const { refreshKey, triggerRefresh } = useRefresh();
     const [selectedDate, setSelectedDate] = useState(() => {
         const date = new Date();
+        const offset = new Date().getTimezoneOffset() / 60;
         date.setDate(date.getDate());
+        date.setHours(date.getHours() - offset);
+        console.log('Current selected date:', date.toISOString().split('T')[0])
         return date.toISOString().split("T")[0];
     });
 

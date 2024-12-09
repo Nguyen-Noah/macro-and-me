@@ -53,7 +53,7 @@ class API {
 }
 
 const baseURL =
-    process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+    process.env.REACT_APP_API_URL || 'http://localhost:5000/api';//
 const api = new API(baseURL);
 export default api;
 
