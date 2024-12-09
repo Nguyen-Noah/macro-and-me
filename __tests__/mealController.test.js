@@ -1,5 +1,13 @@
 import { jest } from '@jest/globals';
 
+jest.mock('mongoose', () => ({
+    ...jest.requireActual('mongoose'),
+    model: jest.fn(() => ({
+      findOne: jest.fn(),
+      save: jest.fn(),
+    })),
+}));
+
 jest.unstable_mockModule("../server/models/User.js", () => ({
     default: {
         findOne: jest.fn(),
