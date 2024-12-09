@@ -1,7 +1,4 @@
 import { jest } from '@jest/globals';
-import mongoose from 'mongoose';
-
-
 /* jest.mock('mongoose', () => ({
     ...jest.requireActual('mongoose'),
     model: jest.fn(() => ({
@@ -23,7 +20,7 @@ jest.unstable_mockModule("../server/models/Log.js", () => ({
 }));
 
 jest.unstable_mockModule("../server/services/foodFactory.js", () => ({
-    findOrCreateFood: jest.fn(),
+    createFood: jest.fn(),
 }));
 
 jest.unstable_mockModule("../server/services/logFactory.js", () => ({
@@ -37,7 +34,7 @@ jest.unstable_mockModule("../server/services/mealFactory.js", () => ({
 const { createMeal, getMealByType } = await import("../server/controllers/mealController.js");
 const User = (await import("../server/models/User.js")).default;
 const Log = (await import("../server/models/Log.js")).default;
-const { findOrCreateFood } = await import("../server/services/foodFactory.js");
+const { createFood } = await import("../server/services/foodFactory.js");
 const { findOrCreateLog } = await import("../server/services/logFactory.js");
 const { findOrCreateMeal } = await import("../server/services/mealFactory.js");
 
@@ -71,21 +68,21 @@ describe("Meal Controller", () => {
 
             User.findOne.mockResolvedValue(mockUser);
             findOrCreateLog.mockResolvedValue(mockLog);
-            findOrCreateFood.mockResolvedValue(mockFood);
+            createFood.mockResolvedValue(mockFood);
             findOrCreateMeal.mockResolvedValue(mockMeal);
 
             await createMeal(req, res);
 
             expect(User.findOne).toHaveBeenCalledWith({ firebaseUid: "testUid" });
             expect(findOrCreateLog).toHaveBeenCalledWith("userId");
-            expect(findOrCreateFood).toHaveBeenCalledWith({
+            expect(createFood).toHaveBeenCalledWith({
                 name: "Oatmeal",
                 calories: 150,
                 fat: 3,
                 carbohydrates: 27,
                 protein: 5,
             });
-            expect(findOrCreateMeal).toHaveBeenCalledWith("breakfast", "foodId");
+            expect(findOrCreateMeal).toHaveBeenCalledWith("userId", "breakfast", "foodId");
             expect(mockLog.save).toHaveBeenCalled();
             expect(mockUser.save).toHaveBeenCalled();
             expect(res.status).toHaveBeenCalledWith(201);
