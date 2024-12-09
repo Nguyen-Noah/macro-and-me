@@ -7,7 +7,7 @@ export const findOrCreateMeal = async (userId, mealType, newFoodId) => {
         date.setHours(0, 0, 0, 0);
         const offset = new Date().getTimezoneOffset() / 60;
         date.setHours(date.getHours() - offset);
-        console.log(date)
+        console.log('findOrCreateMeal date:', date);
 
         const query = {
             userId: userId,

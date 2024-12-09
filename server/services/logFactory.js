@@ -5,8 +5,10 @@ export const findOrCreateLog = async (userId)=> {
         // set the date to query database
         const date = new Date();
         date.setHours(0, 0, 0, 0)
-        date.setHours(date.getHours() - 5);
-        console.log(date)
+        const offset = new Date().getTimezoneOffset() / 60;
+        console.log('server time offset:', offset);
+        date.setHours(date.getHours() - offset);
+        console.log('findOrCreateLog date:', date);
 
         // check for the log and if it doesnt exist, make one
         let dailyLog = await Log.findOne({ userId, date });
