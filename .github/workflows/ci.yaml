@@ -30,6 +30,11 @@ jobs:
         cd __tests__
         npm install
 
+    - name: Install server dependencies
+      run: |
+        cd server
+        npm install
+
     - name: Run Jest tests
       run: |
         npm test
