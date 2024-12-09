@@ -4,9 +4,8 @@ import Meal from "../models/Meal.js";
 export const findOrCreateMeal = async (userId, mealType, newFoodId) => {
     try {
         const date = new Date();
+        date.setHours(date.getHours() - 5);
         date.setHours(0, 0, 0, 0);
-        const offset = new Date().getTimezoneOffset() / 60;
-        date.setHours(date.getHours() - offset);
         console.log('findOrCreateMeal date:', date);
 
         const query = {
